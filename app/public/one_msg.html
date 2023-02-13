@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>💬 Message</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11/dist/vue.js"></script>
+  </head>
+
+  <header class="header">
+    <a href="index.html" class="logo">💬 Messagly</a>
+    <nav class="nav-items">
+      <a href="#">Contacts 📞</a>
+    </nav>
+    <div class="search-container">
+      <form action="/search">
+        <input type="text" placeholder="Search users" />
+        <button type="submit">🔎</button>
+      </form>
+    </div>
+  </header>
+
+  <main>
+    <div class="intro">
+      <h2>Message</h2>
+      <body id="message-details-body">
+        <div id="app" class="app">
+          <div id="message-details">
+            <h1 id="message-user">{{message.user}}</h1>
+            <p id="message-date">{{message.date}}</p>
+            <p id="message-text">{{message.text}}</p>
+            <button id="likeBtn">Like</button>
+          </div>
+        </div>
+
+        <script>
+          window.onload = function () {
+            const messageId = localStorage.getItem("message");
+            const userId = localStorage.getItem("username");
+            const message = JSON.parse(localStorage.getItem("message"));
+
+            const messageUserId = new Vue({
+              el: "#message-details",
+              data: {
+                message: message,
+              },
+            });
+
+            const likeBtn = document.getElementById("likeBtn");
+            if (likeBtn) {
+              const btnState = localStorage.getItem("likeBtnState");
+              likeBtn.innerHTML = btnState || "Like";
+              likeBtn.addEventListener("click", function () {
+                const message = localStorage.getItem("message");
+                const messageObject = JSON.parse(message);
+                const messageId = messageObject._id;
+                alert(messageId);
+
+                if (likeBtn.innerHTML === "Like") {
+                  localStorage.setItem("likeBtnState", "Unlike");
+                  likeBtn.innerHTML = "Unlike";
+                  fetch(`http://localhost:3000/api/social/like/${messageId}`, {
+                    method: "POST",
+                  });
+                } else {
+                  likeBtn.innerHTML = "Like";
+                  localStorage.setItem("likeBtnState", "Like");
+                  fetch(`http://localhost:3000/api/social/like/${messageId}`, {
+                    method: "DELETE",
+                  });
+                }
+              });
+            }
+          };
+        </script>
+      </body>
+    </div>
+  </main>
+</html>

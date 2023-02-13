@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>💬 Message writing...</title>
+    <link rel="stylesheet" href="new_style.css" />
+  </head>
+
+  <body>
+    <header class="header">
+      <a href="index.html" class="logo">💬 Messagly</a>
+      <div class="search-container">
+        <form class="search-form" action="#" method="get">
+          <input
+            type="text"
+            id="search"
+            name="search"
+            placeholder="Search users"
+          />
+          <button class="search-button" type="submit">Go</button>
+        </form>
+      </div>
+    </header>
+    <div class="intro">
+      <button
+        class="home-buttons"
+        onclick="window.history.back()"
+        style="color: white; position: absolute; top: 100px; left: 45px"
+      >
+        ⬅️ Go Back
+      </button>
+      <div class="main">
+        <h3>Write your message:</h3>
+        <textarea
+          rows="4"
+          cols="50"
+          placeholder="Write your message here..."
+          id="txt"
+        >
+        </textarea>
+      </div>
+      <button class="home-buttons" type="submit" id="posting">Post it</button>
+    </div>
+
+    <script>
+      const post = document.getElementById("posting");
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const newMsg = document.getElementById("txt").value;
+        const res = await fetch("http://localhost:3000/api/social/messages", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ username, password }),
+        })
+          .then((res) => {
+            console.log(res);
+            return res.json();
+          })
+          .then((data) => {
+            window.location.href = "after_msg_post.html";
+          })
+          .catch((error) => {
+            console.error(
+              "There was a problem with the fetch operation:",
+              error
+            );
+          });
+      });
+    </script>
+
+    <footer class="footer">
+      <div class="copy">© 2023 Developer</div>
+    </footer>
+  </body>
+</html>

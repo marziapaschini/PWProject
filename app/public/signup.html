@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>💬 Sign up</title>
+    <link rel="stylesheet" href="new_style.css" />
+  </head>
+
+  <body>
+    <header class="header">
+      <a href="index.html" class="logo">💬 Messagly</a>
+    </header>
+
+    <main>
+      <div class="intro">
+        <button
+          class="home-buttons"
+          onclick="window.history.back()"
+          style="position: absolute; top: 100px; left: 45px"
+        >
+          ⬅️ Go Back
+        </button>
+        <div class="form-container">
+          <h2>Sign Up</h2>
+          <form>
+            <div class="form-group">
+              <input type="text" placeholder="Name" required />
+              <input type="text" placeholder="Surname" required />
+              <input type="email" placeholder="Username" required />
+              <input type="password" placeholder="Password" required />
+              <input type="text" placeholder="Bio" required />
+            </div>
+            <input type="submit" value="Sign Up" />
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      const form = document.getElementById("signUpForm");
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const name = document.getElementById("name").value;
+        const surname = document.getElementById("surname").value;
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
+        const bio = document.getElementById("about").value;
+        const res = await fetch("http://localhost:3000/api/auth/signup", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ username, password, name, surname, bio }),
+        })
+          .then((res) => {
+            console.log(res);
+            return res.json();
+          })
+          .then((data) => {
+            if (data.message === "New user added") {
+              const expiration = new Date();
+              expiration.setDate(expiration.getDate() + 7);
+              document.cookie = `jwt=${
+                data.token
+              }; expires=${expiration.toUTCString()}; path=/`;
+              document.cookie = `user=${JSON.stringify(
+                data.user
+              )}; expires=${expiration.toUTCString()}; path=/`;
+              window.location.href = "after_login.html";
+            } else if (data.message === "User Already Exists. Please Login") {
+              alert("User Already Exists. Please Login.");
+            } else if (data.message === "Missing credentials") {
+              alert(
+                "Missing username or password. Please fill both these fields."
+              );
+            }
+          })
+          .catch((error) => {
+            console.error(
+              "There was a problem with the fetch operation:",
+              error
+            );
+            alert("An error occurred while signing up, please try again.");
+          });
+      });
+    </script>
+
+    <footer class="footer">
+      <div class="copy">© 2023 Developer</div>
+    </footer>
+  </body>
+</html>

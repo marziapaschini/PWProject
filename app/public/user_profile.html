@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>💬 Your Profile</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+  </head>
+
+  <body>
+    <header class="header">
+      <a href="index.html" class="logo">💬 Messagly</a>
+      <nav class="nav-items">
+        <a href="#">Contacts 📞</a>
+      </nav>
+      <div class="search-container">
+        <form action="/search">
+          <input type="text" placeholder="Search users" />
+          <button type="submit">🔎</button>
+        </form>
+      </div>
+    </header>
+    <div class="intro">
+      <div class="main" id="app">
+        <h3>Profile</h3>
+        <div class="card">
+          <table>
+            <tr>
+              <td class="p2">Name:</td>
+              <td class="p3">{{ userData.name }}</td>
+            </tr>
+            <tr>
+              <td class="p2">Surname:</td>
+              <td class="p3">{{ userData.surname }}</td>
+            </tr>
+            <tr>
+              <td class="p2">Username:</td>
+              <td class="p3">{{ userData.username }}</td>
+            </tr>
+            <tr>
+              <td class="p2">Bio:</td>
+              <td class="p3" style="width: 350px; overflow: scroll;">{{ userData.bio }}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      <button>View user's messages</button>
+    </div>
+
+    <script>
+      window.onload = function () {
+        const usernameI = localStorage.getItem("username");
+        const app = new Vue({
+          el: "#app",
+          data: {
+            userData: {},
+          },
+          mounted() {
+            fetch("http://localhost:3000/api/social/whoami")
+              .then((response) => response.json())
+              .then((data) => {
+                this.userData = data;
+              })
+              .catch((error) => console.error(error));
+          },
+        });
+      };
+    </script>
+
+    <footer class="footer">
+      <div class="copy">© 2023 Developer</div>
+    </footer>
+  </body>
+</html>

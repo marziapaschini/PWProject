@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>💬 Logged in</title>
+    <link rel="stylesheet" href="new_style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11/dist/vue.js"></script>
+  </head>
+
+  <body>
+    <header class="header">
+      <a href="index.html" class="logo">💬 Messagly</a>
+      <div class="search-container">
+        <form class="search-form" action="#" method="get">
+          <input
+            type="text"
+            id="search"
+            name="search"
+            placeholder="Search users"
+          />
+          <button class="search-button" type="submit">Go</button>
+        </form>
+      </div>
+    </header>
+
+    <main>
+      <div class="intro">
+        <div id="app">
+          <h1 id="welcomeText">Welcome, {{ userData.username }}!</h1>
+          <p2>What do you want to check?</p2>
+          <div
+            class="buttonsContainer"
+            style="display: flex; justify-content: center"
+          >
+            <div class="buttons">
+              <div>
+                <button
+                  class="home-buttons"
+                  id="goToProfile"
+                  onclick="toProfile()"
+                >
+                  <b>Your profile</b>
+                </button>
+              </div>
+              <div>
+                <button
+                  class="home-buttons"
+                  id="goToFeed"
+                  type="submit"
+                  onclick="toFeed()"
+                >
+                  <b>Your feed</b>
+                </button>
+              </div>
+            </div>
+            <div>
+              <button
+                class="home-buttons"
+                id="goToAllMessages"
+                onclick="toAllMsgs()"
+              >
+                <b>All messages</b>
+              </button>
+            </div>
+          </div>
+          <p2> Did you get a new idea? Share it! </p2>
+          <div style="display: flex; justify-content: center">
+            <button
+              class="home-buttons"
+              id="goToWriteMessage"
+              type="submit"
+              onclick="toMsgWriting()"
+            >
+              <b>Write a message</b>
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="copy">© 2023 Developer</div>
+    </footer>
+
+    <script>
+      window.onload = function () {
+        const usernameI = localStorage.getItem("username");
+        const app = new Vue({
+          el: "#app",
+          data: {
+            userData: {},
+          },
+          mounted() {
+            fetch("http://localhost:3000/api/social/whoami")
+              .then((response) => response.json())
+              .then((data) => {
+                this.userData = data;
+              })
+              .catch((error) => console.error(error));
+          },
+        });
+      };
+
+      function toProfile() {
+        window.location.href = "user_profile.html";
+      }
+      function toAllMsgs() {
+        window.location.href = "msgs.html";
+      }
+      function toFeed() {}
+      const buttonGoToFeed = document.getElementById("goToFeed");
+      buttonGoToFeed.addEventListener("submit", async (e) => {
+        event.preventDefault();
+        const res = await fetch("http://localhost:3000/api/social/feed", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(),
+        })
+          .then((res) => {
+            console.log(res);
+            return res.json();
+          })
+          .then((data) => {
+            window.location.href = "feed.html";
+          })
+          .catch((error) => {
+            console.error(
+              "There was a problem with the fetch operation:",
+              error
+            );
+          });
+      });
+      function toMsgWriting() {
+        window.location.href = "create_msg.html";
+      }
+    </script>
+  </body>
+</html>

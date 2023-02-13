@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>💬 Feed</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11/dist/vue.js"></script>
+  </head>
+
+  <body>
+    <header class="header">
+      <a href="index.html" class="logo">💬 Messagly</a>
+      <nav class="nav-items">
+        <div class="search-container">
+          <form action="/search">
+            <input type="text" placeholder="Search users" />
+            <button type="submit">🔎</button>
+          </form>
+        </div>
+        <a href="#">Contacts 📞</a>
+      </nav>
+    </header>
+    <main>
+      <div id="app">
+        <div class="intro">
+          <h2>Your feed</h2>
+          <div class="scrollable-container">
+            <template>
+              <div>
+                <ul>
+                  <li
+                    class="post"
+                    v-for="message in messages"
+                    :key="message._id"
+                  >
+                    <div class="post-header">
+                      <div class="post-author">{{ message.author }}</div>
+                      <div class="post-date">
+                        {{ formatDate(message.date) }}
+                      </div>
+                    </div>
+                    <div class="post-content">{{ message.text }}</div>
+                    <div class="likes">
+                      <span id="like-count">0</span> likes
+                      <button id="like-button">👍</button>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="copy">© 2023 Developer</div>
+    </footer>
+
+    <script>
+      window.onload = function () {
+        const app = new Vue({
+          el: "#app",
+          data: {
+            messages: [],
+          },
+          created() {
+            fetch("http://localhost:3000/api/social/feed", {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            })
+              .then((res) => {
+                console.log(res);
+                return res.json();
+              })
+              .then((data) => {
+                this.messages = data;
+              })
+              .catch((error) => {
+                console.error(error);
+              });
+          },
+          methods: {
+            formatDate(date) {
+              const dateObject = new Date(date);
+              return dateObject.toLocaleString();
+            },
+          },
+        });
+      };
+    </script>
+  </body>
+</html>

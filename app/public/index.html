@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>💬 Messagly</title>
+    <link rel="stylesheet" href="new_style.css" />
+  </head>
+
+  <body>
+    <header class="header">
+      <a href="#" class="logo">💬 Messagly</a>
+      <div class="search-container">
+        <form class="search-form" action="#" method="get">
+          <input
+            type="text"
+            id="search"
+            name="search"
+            placeholder="Search users"
+          />
+          <button class="search-button" type="submit">Go</button>
+        </form>
+      </div>
+    </header>
+    <main>
+      <div class="intro">
+        <div class="home-container">
+          <h1>Welcome to Messagly!</h1>
+          <p2>
+            Get in touch with people around the world by reading everyone's
+            thoughts.
+          </p2>
+          <button class="home-buttons" onclick="toAllMsgs()">
+            Take a look
+          </button>
+          <p2>Enjoy Messagly Community</p2>
+          <div class="buttons">
+            <button class="home-buttons" onclick="toSignIn()">Sign in</button>
+            <p2>or</p2>
+            <button class="home-buttons" onclick="toSignUp()">Sign up</button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="copy">© 2023 Developer</div>
+    </footer>
+
+    <script>
+      function toAllMsgs() {
+        window.location.href = "msgs.html";
+      }
+      function toSignIn() {
+        window.location.href = "signin.html";
+      }
+      function toSignUp() {
+        window.location.href = "signup.html";
+      }
+    </script>
+  </body>
+</html>

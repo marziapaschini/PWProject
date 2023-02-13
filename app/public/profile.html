@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>💬 Messagly</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11/dist/vue.js"></script>
+  </head>
+
+  <body>
+    <header class="header">
+      <a href="index.html" class="logo">💬 Messagly</a>
+      <nav class="nav-items">
+        <a href="#">Contacts 📞</a>
+      </nav>
+      <div class="search-container">
+        <form action="/search">
+          <input type="text" placeholder="Search users" />
+          <button type="submit">🔎</button>
+        </form>
+      </div>
+    </header>
+
+    <div class="intro">
+      <body>
+        <div id="app">
+          <div class="card">
+            <div id="profile-container" class="profile-container">
+              <template v-for="user in users">
+                <h2 id="username">Username: {{user.username}}</h2>
+                <p id="name">Name: {{user.name}}</p>
+                <p id="surname">Surname: {{user.surname}}</p>
+                <p id="bio">Bio: {{user.bio}}</p>
+              </template>
+              <button id="followerBtn">Followers</button>
+              <button id="followBtn">Follow</button>
+              <!--<button id = "unfollowBtn">Unfollow</button>-->
+              <button id="viewMsg">Messages</button>
+            </div>
+          </div>
+        </div>
+      </body>
+    </div>
+
+    <script>
+      window.onload = function () {
+        const users = JSON.parse(localStorage.getItem("users"));
+        const username = users[0].username;
+        localStorage.setItem("username", username);
+        const profile = new Vue({
+          el: "#profile-container",
+          data: {
+            users: users,
+          },
+        });
+      };
+
+      window.onload = function () {
+        const users = JSON.parse(localStorage.getItem("users"));
+        const username = users[0].username;
+        localStorage.setItem("username", username);
+        const profile = new Vue({
+          el: "#profile-container",
+          data: {
+            users: users,
+          },
+        });
+
+        const btn = document.getElementById("followerBtn");
+        btn.addEventListener("click", async (event) => {
+          event.preventDefault();
+          const username = localStorage.getItem("username");
+          fetch(`http://localhost:3000/api/social/followers/${username}`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
+            .then((res) => res.json())
+            .then((followers) => {
+              localStorage.setItem("followers", JSON.stringify(followers));
+              window.location.href = "followerslist.html";
+            })
+            .catch((err) => console.error(err));
+        });
+
+        const viewMsg = document.getElementById("viewMsg");
+        if (viewMsg) {
+          viewMsg.addEventListener("click", async (event) => {
+            event.preventDefault();
+            const userId = localStorage.getItem("username");
+            fetch(`http://localhost:3000/api/social/messages/${username}`, {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            })
+              .then((res) => res.json())
+              .then((messages) => {
+                localStorage.setItem("messages", JSON.stringify(messages));
+                window.location.href = "one_msg.html";
+              })
+              .catch((err) => console.error(err));
+          });
+        }
+        // retrieve the button status from localStorage
+        let buttonStatus = localStorage.getItem("followButtonStatus");
+
+        // if the status is not set in localStorage, set it to "follow" by default
+        if (!buttonStatus) {
+          buttonStatus = "follow";
+        }
+
+        // get the follow button element
+        const followBtn = document.getElementById("followBtn");
+
+        // update the button text and color based on the retrieved status
+        if (buttonStatus === "follow") {
+          followBtn.innerText = "Follow";
+          followBtn.style.backgroundColor = "#0c756d";
+        } else {
+          followBtn.innerText = "Unfollow";
+          followBtn.style.backgroundColor = "gray";
+        }
+
+        // add a click event listener to the button
+        followBtn.addEventListener("click", async function () {
+          // toggle the button status
+          if (buttonStatus === "follow") {
+            buttonStatus = "unfollow";
+            followBtn.innerText = "Unfollow";
+            followBtn.style.backgroundColor = "gray";
+            // make a fetch request to the delete API
+            const response = await fetch(
+              "http://localhost:3000/api/social/followers/:id",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                credentials: "include",
+              }
+            );
+          } else {
+            buttonStatus = "follow";
+            followBtn.innerText = "Follow";
+            followBtn.style.backgroundColor = "#0c756d";
+
+            // make a fetch request to the post API
+            const response = await fetch(
+              "http://localhost:3000/api/social/followers/:id",
+              {
+                method: "DELETE",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                credentials: "include",
+              }
+            );
+          }
+
+          // store the updated button status in localStorage
+          localStorage.setItem("followButtonStatus", buttonStatus);
+        });
+      };
+    </script>
+
+    <footer class="footer">
+      <div class="copy">© 2023 Developer</div>
+    </footer>
+  </body>
+</html>

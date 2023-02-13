@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>💬 Search results</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+  </head>
+
+  <body>
+    <header class="header">
+      <a href="index.html" class="logo">💬 Messagly</a>
+      <nav class="nav-items">
+        <div class="search-container">
+          <form action="/search">
+            <input type="text" placeholder="Search users" />
+            <button type="submit">🔎</button>
+          </form>
+        </div>
+        <a href="#">Contacts 📞</a>
+      </nav>
+    </header>
+
+    <main>
+      <div class="intro">
+        <div id="app">
+          <h2>Your search results</h2>
+            <ul>
+              <li v-for="user in users">{{ user }}</li>
+            </ul>
+        </div>
+    </main>
+
+    <footer class="footer">
+      <div class="copy">© 2023 Developer</div>
+    </footer>
+
+    <script>
+        window.onload = function () {
+          const usernameI = localStorage.getItem("username");
+          const app = new Vue({
+            el: "#app",
+            data: {
+              usernameI: usernameI,
+            },
+          });
+        };
+      </script>
+
+  </body>
+</html>
