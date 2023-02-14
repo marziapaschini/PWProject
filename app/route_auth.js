@@ -72,4 +72,28 @@ router.get("/verify", async (req, res) => {
   }
 });
 
+router.post("/signout", (req, res) => {
+  try {
+    const token = req.cookies.jwt;
+    if (!token) {
+      res.status(401).json({ message: "Not authenticated" });
+    } else {
+      const decoded = jwt.verify(token, "secret_key");
+      const userId = decoded.id;
+      req.session.destroy((err) => {
+        if (err) {
+          console.error(err);
+          res.status(500).json({ message: "Failed to log out" });
+        } else {
+          res.clearCookie("jwt");
+          res.status(200).json({ message: "You have been logged out" });
+        }
+      });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to log out" });
+  }
+});
+
 module.exports = router;

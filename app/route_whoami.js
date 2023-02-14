@@ -7,13 +7,13 @@ router.get("/whoami", async (req, res) => {
   try {
     const token = req.cookies.jwt;
     if (!token) {
-      res.status(401).json("Unhauthorized: you are not a logged user.");
+      res.status(401).json("Unhauthorized, not a logged user");
     }
     const decoded = jwt.verify(token, "secret_key");
     const mongo = db.getDb();
     const user = await mongo
       .collection("users")
-      .findOne({ "_id.username": decoded.id.username });
+      .findOne({ "_id.username": decoded.id });
     res.json(user);
   } catch (err) {
     console.log(err);

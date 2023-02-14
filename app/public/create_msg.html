@@ -38,42 +38,40 @@
           cols="50"
           placeholder="Write your message here..."
           id="txt"
-        >
-        </textarea>
+        ></textarea>
       </div>
       <button class="home-buttons" type="submit" id="posting">Post it</button>
     </div>
 
-    <script>
-      const post = document.getElementById("posting");
-      form.addEventListener("submit", async (event) => {
-        event.preventDefault();
-        const newMsg = document.getElementById("txt").value;
-        const res = await fetch("http://localhost:3000/api/social/messages", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ username, password }),
-        })
-          .then((res) => {
-            console.log(res);
-            return res.json();
-          })
-          .then((data) => {
-            window.location.href = "after_msg_post.html";
-          })
-          .catch((error) => {
-            console.error(
-              "There was a problem with the fetch operation:",
-              error
-            );
-          });
-      });
-    </script>
-
     <footer class="footer">
       <div class="copy">© 2023 Developer</div>
     </footer>
+
+    <script>
+      window.onload = function () {
+        const post = document.getElementById("posting");
+        post.addEventListener("click", async (e) => {
+          e.preventDefault();
+          const newMsg = document.getElementById("txt").value;
+          const res = await fetch("http://localhost:3000/api/social/messages", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ text }),
+          })
+            .then((res) => {
+              return res.json();
+            })
+            .then((data) => {
+              alert("Your message has been posted!");
+              window.location.href = "msgs.html";
+            })
+            .catch((error) => {
+              console.error("Something went wrong during fetch: ", error);
+            });
+        });
+      };
+    </script>
   </body>
 </html>

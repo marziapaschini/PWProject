@@ -5,26 +5,35 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>💬 Your Profile</title>
-    <link rel="stylesheet" href="style.css" />
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <link rel="stylesheet" href="new_style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11/dist/vue.js"></script>
   </head>
 
   <body>
     <header class="header">
       <a href="index.html" class="logo">💬 Messagly</a>
-      <nav class="nav-items">
-        <a href="#">Contacts 📞</a>
-      </nav>
       <div class="search-container">
-        <form action="/search">
-          <input type="text" placeholder="Search users" />
-          <button type="submit">🔎</button>
+        <form class="search-form" action="#" method="get">
+          <input
+            type="text"
+            id="search"
+            name="search"
+            placeholder="Search users"
+          />
+          <button class="search-button" type="submit">🔍</button>
         </form>
       </div>
     </header>
     <div class="intro">
+      <button
+        class="home-buttons"
+        onclick="window.history.back()"
+        style="color: white; position: absolute; top: 100px; left: 45px"
+      >
+        ⬅️ Go Back
+      </button>
       <div class="main" id="app">
-        <h3>Profile</h3>
+        <h3>Your Profile</h3>
         <div class="card">
           <table>
             <tr>
@@ -41,13 +50,24 @@
             </tr>
             <tr>
               <td class="p2">Bio:</td>
-              <td class="p3" style="width: 350px; overflow: scroll;">{{ userData.bio }}</td>
+              <td class="p3" style="width: 350px; overflow: scroll">
+                {{ userData.bio }}
+              </td>
             </tr>
           </table>
         </div>
       </div>
-      <button>View user's messages</button>
+      <div class="buttons">
+        <button class="home-buttons">💬 Your messages</button>
+        <button class="home-buttons">👁️‍🗨️ Your feed</button>
+        <button class="home-buttons">👥 Your followers</button>
+      </div>
+      <button class="home-buttons">✍🏾 Write a new message</button>
     </div>
+
+    <footer class="footer">
+      <div class="copy">© 2023 Developer</div>
+    </footer>
 
     <script>
       window.onload = function () {
@@ -68,9 +88,5 @@
         });
       };
     </script>
-
-    <footer class="footer">
-      <div class="copy">© 2023 Developer</div>
-    </footer>
   </body>
 </html>

@@ -4,21 +4,23 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>💬 Messagly</title>
-    <link rel="stylesheet" href="style.css" />
+    <title>💬 Profile</title>
+    <link rel="stylesheet" href="new_style.css" />
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11/dist/vue.js"></script>
   </head>
 
   <body>
     <header class="header">
       <a href="index.html" class="logo">💬 Messagly</a>
-      <nav class="nav-items">
-        <a href="#">Contacts 📞</a>
-      </nav>
       <div class="search-container">
-        <form action="/search">
-          <input type="text" placeholder="Search users" />
-          <button type="submit">🔎</button>
+        <form class="search-form" action="#" method="get">
+          <input
+            type="text"
+            id="search"
+            name="search"
+            placeholder="Search users"
+          />
+          <button class="search-button" type="submit">Go</button>
         </form>
       </div>
     </header>
@@ -34,10 +36,10 @@
                 <p id="surname">Surname: {{user.surname}}</p>
                 <p id="bio">Bio: {{user.bio}}</p>
               </template>
-              <button id="followerBtn">Followers</button>
-              <button id="followBtn">Follow</button>
+              <button class="home-buttons" id="followerBtn">👥 Followers</button>
+              <button class="home-buttons" id="followBtn">Follow</button>
               <!--<button id = "unfollowBtn">Unfollow</button>-->
-              <button id="viewMsg">Messages</button>
+              <button class="home-buttons" id="viewMsg">💬 Messages</button>
             </div>
           </div>
         </div>
@@ -68,9 +70,9 @@
           },
         });
 
-        const btn = document.getElementById("followerBtn");
-        btn.addEventListener("click", async (event) => {
-          event.preventDefault();
+        const button = document.getElementById("followerBtn");
+        button.addEventListener("click", async (e) => {
+          e.preventDefault();
           const username = localStorage.getItem("username");
           fetch(`http://localhost:3000/api/social/followers/${username}`, {
             method: "GET",
@@ -81,15 +83,15 @@
             .then((res) => res.json())
             .then((followers) => {
               localStorage.setItem("followers", JSON.stringify(followers));
-              window.location.href = "followerslist.html";
+              window.location.href = "user_followers.html";
             })
             .catch((err) => console.error(err));
         });
 
         const viewMsg = document.getElementById("viewMsg");
         if (viewMsg) {
-          viewMsg.addEventListener("click", async (event) => {
-            event.preventDefault();
+          viewMsg.addEventListener("click", async (e) => {
+            e.preventDefault();
             const userId = localStorage.getItem("username");
             fetch(`http://localhost:3000/api/social/messages/${username}`, {
               method: "GET",
@@ -100,7 +102,7 @@
               .then((res) => res.json())
               .then((messages) => {
                 localStorage.setItem("messages", JSON.stringify(messages));
-                window.location.href = "one_msg.html";
+                window.location.href = "one_user_msgs.html";
               })
               .catch((err) => console.error(err));
           });

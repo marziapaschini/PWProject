@@ -159,22 +159,27 @@
             );
             const message = await res.json();
             localStorage.setItem("message", JSON.stringify(message));
-            if (target.innerHTML === "Like") {
-              target.innerHTML = "Unlike";
-              const res = await fetch(
-                `http://localhost:3000/api/social/like/${messageId}`,
-                {
-                  method: "POST",
-                }
-              );
-            } else {
-              target.innerHTML = "Like";
-              const res = await fetch(
-                `http://localhost:3000/api/social/like/${messageId}`,
-                {
-                  method: "DELETE",
-                }
-              );
+            if (target.id === "likeButton") {
+              event.preventDefault();
+              const messageId = target.getAttribute("dataId");
+              const userId = target.getAttribute("dataUser");
+              if (target.innerHTML === "Like") {
+                target.innerHTML = "Unlike";
+                const res = await fetch(
+                  `http://localhost:3000/api/social/like/${messageId}`,
+                  {
+                    method: "POST",
+                  }
+                );
+              } else {
+                target.innerHTML = "Like";
+                const res = await fetch(
+                  `http://localhost:3000/api/social/like/${messageId}`,
+                  {
+                    method: "DELETE",
+                  }
+                );
+              }
             }
           }
         });
