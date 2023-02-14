@@ -33,10 +33,10 @@
         </button>
         <h3>{{username}}'s messages</h3>
         <div class="scrollable-container">
-          <template>
+          <template v-for="message in messages" :key="message._id">
             <div>
               <ul>
-                <li class="post" v-for="message in messages" :key="message._id">
+                <li class="post">
                   <div class="post-header">
                     <div class="post-author">{{ message.author }}</div>
                     <div class="post-date">{{ formatDate(message.date) }}</div>

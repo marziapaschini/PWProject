@@ -39,52 +39,58 @@
     </main>
 
     <script>
-      const form = document.getElementById("signUpForm");
-      form.addEventListener("submit", async (event) => {
-        event.preventDefault();
-        const name = document.getElementById("name").value;
-        const surname = document.getElementById("surname").value;
-        const username = document.getElementById("username").value;
-        const password = document.getElementById("password").value;
-        const bio = document.getElementById("about").value;
-        const res = await fetch("http://localhost:3000/api/auth/signup", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ username, password, name, surname, bio }),
-        })
-          .then((res) => {
-            console.log(res);
-            return res.json();
-          })
-          .then((data) => {
-            if (data.message === "New user added") {
-              const expiration = new Date();
-              expiration.setDate(expiration.getDate() + 7);
-              document.cookie = `jwt=${
-                data.token
-              }; expires=${expiration.toUTCString()}; path=/`;
-              document.cookie = `user=${JSON.stringify(
-                data.user
-              )}; expires=${expiration.toUTCString()}; path=/`;
-              window.location.href = "after_login.html";
-            } else if (data.message === "User Already Exists. Please Login") {
-              alert("User Already Exists. Please Login.");
-            } else if (data.message === "Missing credentials") {
-              alert(
-                "Missing username or password. Please fill both these fields."
-              );
-            }
-          })
-          .catch((error) => {
-            console.error(
-              "There was a problem with the fetch operation:",
-              error
+      window.onload = function () {
+        const form = document.getElementById("signUpForm");
+        if (form) {
+          form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const name = document.getElementById("name").value;
+            const surname = document.getElementById("surname").value;
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            const bio = document.getElementById("about").value;
+            const updatedUsername = localStorage.setItem(
+              "updatedUsername",
+              username
             );
-            alert("An error occurred while signing up, please try again.");
+            const res = await fetch("http://localhost:3000/api/auth/signup", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ name, surname, username, password, bio }),
+            })
+              .then((res) => {
+                return res.json();
+              })
+              .then((data) => {
+                if (data.message === "New user added") {
+                  /*  const expiration = new Date();
+                expiration.setDate(expiration.getDate() + 7);
+                document.cookie = `jwt=${
+                  data.token
+                }; expires=${expiration.toUTCString()}; path=/`;
+                document.cookie = `user=${JSON.stringify(
+                  data.user
+                )}; expires=${expiration.toUTCString()}; path=/`; */
+                  window.location.href = "after_login.html";
+                } else if (
+                  data.message === "Already existing user, please Login"
+                ) {
+                  alert("Already existing user, please Login");
+                } else if (data.message === "Missing credentials") {
+                  alert(
+                    "Missing username or password, please fill both these fields"
+                  );
+                }
+              })
+              .catch((error) => {
+                console.error("Something went wrong during fetch:", error);
+                alert("An error occurred while signing up, please try again");
+              });
           });
-      });
+        }
+      };
     </script>
 
     <footer class="footer">

@@ -41,6 +41,12 @@
     </main>
 
     <script>
+      function toSignUp() {
+        window.location.href = "signup.html";
+      }
+    </script>
+
+    <script>
       window.onload = function () {
         const form = document.getElementById("signInForm");
         form.addEventListener("submit", async (event) => {
@@ -60,20 +66,17 @@
             })
             .then((data) => {
               if (data.message === "Authenticated") {
-                document.cookie = "jwt=" + data.token;
+                /*  document.cookie = "jwt=" + data.token;
                 document.cookie = "user=" + JSON.stringify(data.user);
-                window.location.href = "after_login.html";
-              } else if (data.message === "No such username was found.") {
-                alert("Username not found. Please try again.");
+                window.location.href = "after_login.html"; */
+              } else if (data.message === "Username not found") {
+                alert("Username not found, please try again");
               } else if (data.message === "Invalid credentials") {
-                alert("Invalid username or password. Please try again.");
+                alert("Invalid username or password, please try again");
               }
             })
             .catch((error) => {
-              console.error(
-                "There was a problem with the fetch operation: ",
-                error
-              );
+              console.error("Something went wrong during fetch: ", error);
             });
         });
       };
@@ -83,9 +86,4 @@
       <div class="copy">© 2023 Developer</div>
     </footer>
   </body>
-  <script>
-    function toSignUp() {
-      window.location.href = "signup.html";
-    }
-  </script>
 </html>
