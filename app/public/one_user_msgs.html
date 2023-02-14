@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>💬 Messages</title>
+    <link rel="stylesheet" href="new_style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11/dist/vue.js"></script>
+  </head>
+
+  <header class="header">
+    <a href="index.html" class="logo">💬 Messagly</a>
+    <div class="search-container">
+      <form class="search-form" action="#" method="get">
+        <input
+          type="text"
+          id="search"
+          name="search"
+          placeholder="Search users"
+        />
+        <button class="search-button" type="submit">Go</button>
+      </form>
+    </div>
+  </header>
+
+  <main>
+    <div id="app">
+      <div class="intro">
+        <button
+          class="home-buttons"
+          onclick="window.history.back()"
+          style="color: white; position: absolute; top: 100px; left: 45px"
+        >
+          ⬅️ Go Back
+        </button>
+        <h3>{{username}}'s messages</h3>
+        <div class="scrollable-container">
+          <template>
+            <div>
+              <ul>
+                <li class="post" v-for="message in messages" :key="message._id">
+                  <div class="post-header">
+                    <div class="post-author">{{ message.author }}</div>
+                    <div class="post-date">{{ formatDate(message.date) }}</div>
+                  </div>
+                  <div class="post-content">{{ message.text }}</div>
+                  <div class="likes">
+                    <span id="like-count">{{ likes[message._id] }}</span>
+                    likes
+                    <button id="likeButton">👍</button>
+                    <button
+                      id="oneMsgButton"
+                      dataId="${message._id}"
+                      dataUser="${message.user}"
+                      style="color: white"
+                    >
+                      Read message
+                    </button>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </template>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    window.onload = function () {
+      const username = localStorage.getItem("username");
+      const messageUserId = new Vue({
+        el: "#app",
+        data: {
+          messages: [],
+          likes: [],
+        },
+        created() {
+          fetch(`http://localhost:3000/api/social/messages/${username}`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
+            .then((res) => {
+              console.log(res);
+              return res.json();
+            })
+            .then((data) => {
+              console.log("Data from API:", data);
+              this.messages = data;
+              console.log(this.message);
+              this.messages.forEach((message) => {
+                this.likes[message._id] = 0;
+                fetch(`http://localhost:3000/api/social/like/${message._id}`, {
+                  method: "GET",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                })
+                  .then((res) => res.json())
+                  .then((data) => {
+                    console.log("Data from like API:", data);
+                    this.likes[message._id] = data.likes;
+                  })
+                  .catch((error) => {
+                    console.error(error);
+                  });
+              });
+            })
+            .catch((error) => {
+              console.error(error);
+            });
+        },
+        methods: {
+          formatDate(date) {
+            const dateObject = new Date(date);
+            return dateObject.toLocaleString();
+          },
+        },
+      });
+
+      const likeButton = document.getElementById("likeButton");
+      if (likeButton) {
+        const btnState = localStorage.getItem("likeBtnState");
+        likeButton.innerHTML = btnState || "Like";
+        likeButton.addEventListener("click", function () {
+          const message = localStorage.getItem("message");
+          const messageObject = JSON.parse(message);
+          const messageId = messageObject._id;
+          alert(messageId);
+
+          if (likeButton.innerHTML === "Like") {
+            localStorage.setItem("likeBtnState", "Unlike");
+            likeButton.innerHTML = "Unlike";
+            likeButton.style.backgroundColor = "gray";
+            fetch(`http://localhost:3000/api/social/like/${messageId}`, {
+              method: "POST",
+            });
+          } else {
+            likeButton.innerHTML = "Like";
+            likeButton.style.backgroundColor = "#363636";
+            localStorage.setItem("likeBtnState", "Like");
+            fetch(`http://localhost:3000/api/social/like/${messageId}`, {
+              method: "DELETE",
+            });
+          }
+        });
+      }
+
+      fetch("http://localhost:3000/api/auth/verify")
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.message === "Not authenticated") {
+            console.log("User is not logged in");
+            likeButton.style.display = "none";
+          } else {
+            console.log(`User is logged in as ${data.username}`);
+            likeButton.style.display = "block";
+          }
+        })
+        .catch((error) => {
+          console.error("Error during the authentication verify: ", error);
+        });
+    };
+  </script>
+</html>

@@ -41,40 +41,42 @@
     </main>
 
     <script>
-      const form = document.getElementById("signInForm");
-      form.addEventListener("submit", async (event) => {
-        event.preventDefault();
-        const username = document.getElementById("username").value;
-        const password = document.getElementById("password").value;
-        const res = await fetch("http://localhost:3000/api/auth/signin", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ username, password }),
-        })
-          .then((res) => {
-            console.log(res);
-            return res.json();
+      window.onload = function () {
+        const form = document.getElementById("signInForm");
+        form.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const username = document.getElementById("username").value;
+          const password = document.getElementById("password").value;
+          localStorage.setItem("username", username);
+          const res = await fetch("http://localhost:3000/api/auth/signin", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ username, password }),
           })
-          .then((data) => {
-            if (data.message === "Authenticated") {
-              document.cookie = "jwt=" + data.token;
-              document.cookie = "user=" + JSON.stringify(data.user);
-              window.location.href = "after_login.html";
-            } else if (data.message === "No such username was found.") {
-              alert("Username not found. Please try again.");
-            } else if (data.message === "Invalid credentials") {
-              alert("Invalid username or password. Please try again.");
-            }
-          })
-          .catch((error) => {
-            console.error(
-              "There was a problem with the fetch operation:",
-              error
-            );
-          });
-      });
+            .then((res) => {
+              return res.json();
+            })
+            .then((data) => {
+              if (data.message === "Authenticated") {
+                document.cookie = "jwt=" + data.token;
+                document.cookie = "user=" + JSON.stringify(data.user);
+                window.location.href = "after_login.html";
+              } else if (data.message === "No such username was found.") {
+                alert("Username not found. Please try again.");
+              } else if (data.message === "Invalid credentials") {
+                alert("Invalid username or password. Please try again.");
+              }
+            })
+            .catch((error) => {
+              console.error(
+                "There was a problem with the fetch operation: ",
+                error
+              );
+            });
+        });
+      };
     </script>
 
     <footer class="footer">

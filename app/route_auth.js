@@ -58,4 +58,18 @@ router.post("/signin", async (req, res) => {
   }
 });
 
+router.get("/verify", async (req, res) => {
+  try {
+    const token = req.cookies.jwt;
+    if (!token) {
+      res.status(401).json({ message: "Not authenticated" });
+    } else {
+      const decoded = jwt.verify(token, "secret_key");
+      res.json({ message: "Authenticated", username: decoded.id });
+    }
+  } catch (err) {
+    res.status(401).json({ message: "Not authenticated" });
+  }
+});
+
 module.exports = router;

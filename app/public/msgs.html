@@ -55,11 +55,14 @@
                     <div class="likes">
                       <span id="like-count">{{ likes[message._id] }}</span>
                       likes
+                      <button id="likeButton">👍</button>
                       <button
-                        id="like-button"
-                        v-on:click="incrementLikeCount(message._id)"
+                        id="oneMsgButton"
+                        dataId="${message._id}"
+                        dataUser="${message.user}"
+                        style="color: white"
                       >
-                        👍
+                        Read message
                       </button>
                     </div>
                   </li>
@@ -128,10 +131,52 @@
               const dateObject = new Date(date);
               return dateObject.toLocaleString();
             },
-            incrementLikeCount(id) {
-              this.likes[id]++;
-            },
           },
+        });
+        const msgsContainer = document.querySelector(".scrollable-container");
+        msgsContainer.addEventListener("click", async (e) => {
+          const target = event.target;
+          if (target.id === "oneMsgButton") {
+            event.preventDefault();
+            const messageId = target.getAttribute("dataId");
+            const userId = target.getAttribute("dataUser");
+            const res = await fetch(
+              `http://localhost:3000/api/social/messages/${userId}/${messageId}`
+            );
+            const message = await res.json();
+            localStorage.setItem("message", JSON.stringify(message));
+            window.location.href = `http://localhost:3000/one_msg.html`;
+          }
+          if (target.id === "likeButton") {
+            event.preventDefault();
+            const messageId = target.getAttribute("dataId");
+            const userId = target.getAttribute("dataUser");
+            const res = await fetch(
+              `http://localhost:3000/api/social/like/${messageId}`,
+              {
+                method: "POST",
+              }
+            );
+            const message = await res.json();
+            localStorage.setItem("message", JSON.stringify(message));
+            if (target.innerHTML === "Like") {
+              target.innerHTML = "Unlike";
+              const res = await fetch(
+                `http://localhost:3000/api/social/like/${messageId}`,
+                {
+                  method: "POST",
+                }
+              );
+            } else {
+              target.innerHTML = "Like";
+              const res = await fetch(
+                `http://localhost:3000/api/social/like/${messageId}`,
+                {
+                  method: "DELETE",
+                }
+              );
+            }
+          }
         });
       };
     </script>

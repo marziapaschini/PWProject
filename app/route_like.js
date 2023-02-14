@@ -38,7 +38,7 @@ router.post("/like/:idMessage", async (req, res) => {
     res.status(500).json({ error: "HTTP internal server error" });
   }
 });
-/*
+
 router.delete("/like/:idMessage", async (req, res) => {
   try {
     const token = req.cookies.jwt;
@@ -54,21 +54,21 @@ router.delete("/like/:idMessage", async (req, res) => {
     const userWhoDislikes = await mongo
       .collection("users")
       .findOne({ "_id.username": decoded.id.username });
-    const like = await mongo
-      .collection("like")
-      .findOne({}, { sort: { _id: -1 } });
+    console.log(userWhoDislikes);
     const likeToRemove = await mongo
       .collection("like")
-      .findOne({ _id: idMsg });
+      .findOne({ username_user: userWhoDislikes, _id: idMsg });
+    console.log(likeToRemove);
     if (!likeToRemove) {
       return res.status(404).send({ error: "Non-existing like" });
     }
+    let newLikes = await mongo.collection("likes").deleteOne(likeToRemove);
+    res.json(newLikes);
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: "HTTP internal server error" });
   }
 });
-*/
 
 router.get("/like/:idMessage", async (req, res) => {
   const mongo = db.getDb();
