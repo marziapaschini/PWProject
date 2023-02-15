@@ -5,22 +5,25 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>💬 Search results</title>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="new_style.css" />
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
   </head>
 
   <body>
     <header class="header">
       <a href="index.html" class="logo">💬 Messagly</a>
-      <nav class="nav-items">
-        <div class="search-container">
-          <form action="/search">
-            <input type="text" placeholder="Search users" />
-            <button type="submit">🔎</button>
-          </form>
-        </div>
-        <a href="#">Contacts 📞</a>
-      </nav>
+      <div class="search-container">
+        <form class="search-form" action="#" method="get">
+          <input
+            type="text"
+            id="search"
+            name="search"
+            placeholder="Search users"
+          />
+          <button class="search-button" type="submit">🔍</button>
+        </form>
+      </div>
+      <button class="home-buttons" id="sign-out-button">Sign Out</button>
     </header>
 
     <main>
