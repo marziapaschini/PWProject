@@ -10,16 +10,16 @@ router.get("/feed", async (req, res) => {
     const mongo = db.getDb();
     const user = await mongo
       .collection("users")
-      .findOne({ "_id.username": decoded.id.username });
+      .findOne({ username: decoded.id });
     const followed = await mongo
       .collection("followers")
       .find({ follows: user.username })
       .toArray();
     let followedMessages = [];
-    for (i of followed) {
+    for (flw of followed) {
       let followedMessage = await mongo
         .collection("messages")
-        .find({ author: i.isFollowed })
+        .find({ author: flw.isFollowed })
         .toArray();
       followedMessages = followedMessages.concat(followedMessage);
     }

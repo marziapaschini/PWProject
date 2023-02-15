@@ -16,7 +16,7 @@ router.post("/like/:idMessage", async (req, res) => {
     }
     const userWhoLikes = await mongo
       .collection("users")
-      .findOne({ "_id.username": decoded.id.username });
+      .findOne({ username: decoded.id });
     const like = await mongo
       .collection("like")
       .findOne({}, { sort: { _id: -1 } });
@@ -53,7 +53,7 @@ router.delete("/like/:idMessage", async (req, res) => {
     }
     const userWhoDislikes = await mongo
       .collection("users")
-      .findOne({ "_id.username": decoded.id.username });
+      .findOne({ username: decoded.id });
     console.log(userWhoDislikes);
     const likeToRemove = await mongo
       .collection("like")

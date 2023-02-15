@@ -25,39 +25,30 @@
       </div>
       <button class="home-buttons" id="sign-out-button">Sign Out</button>
     </header>
+
     <main>
-      <div id="app">
-        <div class="intro">
-          <button
-            class="home-buttons"
-            onclick="window.history.back()"
-            style="color: white; position: absolute; top: 100px; left: 45px"
-          >
-            ⬅️ Go Back
-          </button>
-          <h3>Your feed</h3>
-          <div class="scrollable-container">
-            <template>
-              <div>
-                <ul>
-                  <li
-                    class="post"
-                    v-for="message in messages"
-                    :key="message._id"
-                  >
-                    <div class="post-header">
-                      <div class="post-author">{{ message.author }}</div>
-                      <div class="post-date">
-                        {{ formatDate(message.date) }}
-                      </div>
-                    </div>
-                    <div class="post-content">{{ message.text }}</div>
-                    <div class="likes">
-                      <span id="like-count">0</span> likes
-                      <button id="likeButton">👍</button>
-                    </div>
-                  </li>
-                </ul>
+      <div class="intro">
+        <button
+          class="home-buttons"
+          onclick="window.history.back()"
+          style="color: white; position: absolute; top: 100px; left: 45px"
+        >
+          ⬅️ Go Back
+        </button>
+        <h3>Your feed</h3>
+        <div class="scrollable-container">
+          <div id="app">
+            <template v-for="message in messages">
+              <div class="post-container">
+                <div class="post-header">
+                  <div class="post-author">{{ message.author }}</div>
+                  <div class="post-date">{{ formatDate(message.date) }}</div>
+                </div>
+                <div class="post-content">{{ message.text }}</div>
+                <div class="likes">
+                  <span id="like-count">0</span> likes
+                  <button id="likeButton">👍</button>
+                </div>
               </div>
             </template>
           </div>
@@ -145,6 +136,30 @@
               }
             }
           }
+        });
+        const signOutButton = document.getElementById("sign-out-button");
+        signOutButton.addEventListener("click", async (e) => {
+          const res = await fetch("http://localhost:3000/api/auth/signout", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
+            .then((res) => {
+              return res.json();
+            })
+            .then((data) => {
+              if (data.message === "Successfully logged out") {
+                window.location.href = "index.html";
+              } else if (data.message === "Failed log out") {
+                alert(
+                  "Something went wrong during logging out, please try again"
+                );
+              }
+            })
+            .catch((error) => {
+              console.error("Something went wrong during fetch: ", error);
+            });
         });
       };
     </script>

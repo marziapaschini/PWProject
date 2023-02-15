@@ -109,6 +109,30 @@
               .catch((error) => console.error(error));
           },
         });
+        const signOutButton = document.getElementById("sign-out-button");
+        signOutButton.addEventListener("click", async (e) => {
+          const res = await fetch("http://localhost:3000/api/auth/signout", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
+            .then((res) => {
+              return res.json();
+            })
+            .then((data) => {
+              if (data.message === "Successfully logged out") {
+                window.location.href = "index.html";
+              } else if (data.message === "Failed log out") {
+                alert(
+                  "Something went wrong during logging out, please try again"
+                );
+              }
+            })
+            .catch((error) => {
+              console.error("Something went wrong during fetch: ", error);
+            });
+        });
       };
 
       function toProfile() {
@@ -117,31 +141,9 @@
       function toAllMsgs() {
         window.location.href = "msgs.html";
       }
-      function toFeed() {}
-      const buttonGoToFeed = document.getElementById("goToFeed");
-      buttonGoToFeed.addEventListener("submit", async (e) => {
-        event.preventDefault();
-        const res = await fetch("http://localhost:3000/api/social/feed", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(),
-        })
-          .then((res) => {
-            console.log(res);
-            return res.json();
-          })
-          .then((data) => {
-            window.location.href = "feed.html";
-          })
-          .catch((error) => {
-            console.error(
-              "There was a problem with the fetch operation:",
-              error
-            );
-          });
-      });
+      function toFeed() {
+        window.location.href = "feed.html";
+      }
       function toMsgWriting() {
         window.location.href = "create_msg.html";
       }
