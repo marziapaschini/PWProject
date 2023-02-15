@@ -1,4 +1,5 @@
 const express = require("express");
+const session = require("express-session");
 const router = express.Router();
 const db = require("./db.js");
 const jwt = require("jsonwebtoken");
@@ -83,10 +84,10 @@ router.post("/signout", (req, res) => {
       req.session.destroy((err) => {
         if (err) {
           console.error(err);
-          res.status(500).json({ message: "Failed to log out" });
+          res.status(500).json({ message: "Failed log out" });
         } else {
           res.clearCookie("jwt");
-          res.status(200).json({ message: "You have been logged out" });
+          res.status(200).json({ message: "Successfully logged out" });
         }
       });
     }

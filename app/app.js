@@ -1,4 +1,5 @@
 const express = require("express");
+const session = require("express-session");
 const db = require("./db.js");
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
@@ -17,6 +18,13 @@ const search = require("./route_search.js");
 app.use(bodyParser.json());
 app.use(express.static("public"));
 app.use(express.json());
+app.use(
+  session({
+    secret: "mysecret",
+    resave: false,
+    saveUninitialized: false,
+  })
+);
 app.use(cookieParser());
 
 app.use("/api/social", users);

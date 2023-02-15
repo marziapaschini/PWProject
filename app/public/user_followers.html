@@ -26,24 +26,20 @@
     </header>
 
     <main>
-      <div id="app">
-        <div class="intro">
-          <button
-            class="home-buttons"
-            onclick="window.history.back()"
-            style="color: white; position: absolute; top: 100px; left: 45px"
-          >
-            ⬅️ Go Back
-          </button>
-          <h3>Followers</h3>
-          <div class="scrollable-container">
-            <template>
+      <div class="intro">
+        <button
+          class="home-buttons"
+          onclick="window.history.back()"
+          style="color: white; position: absolute; top: 100px; left: 45px"
+        >
+          ⬅️ Go Back
+        </button>
+        <h3>Followers</h3>
+        <div class="scrollable-container">
+          <div id="app">
+            <template v-for="follower in followers">
               <div>
-                <ul>
-                  <li class="flwItem" v-for="follower in followers">
-                    <p id="followerName">{{follower.follows}}</p>
-                  </li>
-                </ul>
+                <p id="followerName">{{follower.follows}}</p>
               </div>
             </template>
           </div>
@@ -57,7 +53,6 @@
 
     <script>
       window.onload = function () {
-        const followers = JSON.parse(localStorage.getItem("followers"));
         const followersList = new Vue({
           el: "#followers-container",
           data: {

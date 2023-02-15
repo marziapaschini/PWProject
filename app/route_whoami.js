@@ -9,11 +9,13 @@ router.get("/whoami", async (req, res) => {
     if (!token) {
       res.status(401).json("Unhauthorized, not a logged user");
     }
+    console.log(token);
     const decoded = jwt.verify(token, "secret_key");
     const mongo = db.getDb();
     const user = await mongo
       .collection("users")
-      .findOne({ "_id.username": decoded.id });
+      .findOne({ username: decoded.id });
+    console.log(user);
     res.json(user);
   } catch (err) {
     console.log(err);

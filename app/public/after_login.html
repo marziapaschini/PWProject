@@ -23,10 +23,18 @@
           <button class="search-button" type="submit">Go</button>
         </form>
       </div>
+      <button class="home-buttons" id="sign-out-button">Sign Out</button>
     </header>
 
     <main>
       <div class="intro">
+        <button
+          class="home-buttons"
+          onclick="window.history.back()"
+          style="color: white; position: absolute; top: 100px; left: 45px"
+        >
+          ⬅️ Go Back
+        </button>
         <div id="app">
           <h1 id="welcomeText">Welcome, {{ userData.username }}!</h1>
           <p2>What do you want to check?</p2>
@@ -51,7 +59,7 @@
                   type="submit"
                   onclick="toFeed()"
                 >
-                  <b>Your feed</b>
+                  <b>👁️‍🗨️ Your feed</b>
                 </button>
               </div>
             </div>
@@ -61,7 +69,7 @@
                 id="goToAllMessages"
                 onclick="toAllMsgs()"
               >
-                <b>All messages</b>
+                <b>💬 All messages</b>
               </button>
             </div>
           </div>
@@ -73,7 +81,7 @@
               type="submit"
               onclick="toMsgWriting()"
             >
-              <b>Write a message</b>
+              <b>✍🏾 New message</b>
             </button>
           </div>
         </div>

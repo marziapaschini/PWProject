@@ -25,10 +25,20 @@
         </button>
         <div class="form-container">
           <h2>Sign In</h2>
-          <form>
+          <form id="signInForm">
             <div class="form-group">
-              <input type="email" placeholder="Email" required />
-              <input type="password" placeholder="Password" required />
+              <input
+                type="username"
+                placeholder="Username"
+                id="username"
+                required
+              />
+              <input
+                type="password"
+                placeholder="Password"
+                id="password"
+                required
+              />
             </div>
             <input type="submit" value="Sign In" />
           </form>
@@ -40,6 +50,10 @@
       </div>
     </main>
 
+    <footer class="footer">
+      <div class="copy">© 2023 Developer</div>
+    </footer>
+
     <script>
       function toSignUp() {
         window.location.href = "signup.html";
@@ -49,11 +63,11 @@
     <script>
       window.onload = function () {
         const form = document.getElementById("signInForm");
-        form.addEventListener("submit", async (event) => {
-          event.preventDefault();
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
           const username = document.getElementById("username").value;
-          const password = document.getElementById("password").value;
           localStorage.setItem("username", username);
+          const password = document.getElementById("password").value;
           const res = await fetch("http://localhost:3000/api/auth/signin", {
             method: "POST",
             headers: {
@@ -66,9 +80,7 @@
             })
             .then((data) => {
               if (data.message === "Authenticated") {
-                /*  document.cookie = "jwt=" + data.token;
-                document.cookie = "user=" + JSON.stringify(data.user);
-                window.location.href = "after_login.html"; */
+                window.location.href = "after_login.html";
               } else if (data.message === "Username not found") {
                 alert("Username not found, please try again");
               } else if (data.message === "Invalid credentials") {
@@ -81,9 +93,5 @@
         });
       };
     </script>
-
-    <footer class="footer">
-      <div class="copy">© 2023 Developer</div>
-    </footer>
   </body>
 </html>

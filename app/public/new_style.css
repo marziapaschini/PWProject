@@ -170,7 +170,7 @@ h1 {
 }
 
 input[type="text"],
-input[type="email"],
+input[type="username"],
 input[type="password"] {
   background-color: #f2f2f2;
   border: 1px solid #cccccc;
@@ -325,4 +325,31 @@ textarea {
   border-radius: 15px;
   resize: vertical;
   margin-bottom: 20px;
+}
+
+/* profile */
+.card {
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 15px;
+  padding: 10px;
+}
+
+.card table {
+  width: 100%;
+  font-size: 20px;
+}
+
+.card td {
+  padding: 5px;
+}
+
+.card:hover {
+  border-color: #4eb6c9;
+  box-shadow: 0 0 10px rgba(78, 182, 201, 0.5);
+}
+
+.card .p2 {
+  color: gray;
+  font-weight: bold;
 }
