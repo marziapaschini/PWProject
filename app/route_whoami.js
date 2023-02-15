@@ -6,16 +6,15 @@ const jwt = require("jsonwebtoken");
 router.get("/whoami", async (req, res) => {
   try {
     const token = req.cookies.jwt;
-    if (!token) {
-      res.status(401).json("Unhauthorized, not a logged user");
-    }
     console.log(token);
     const decoded = jwt.verify(token, "secret_key");
     const mongo = db.getDb();
     const user = await mongo
       .collection("users")
       .findOne({ username: decoded.id });
-    console.log(user);
+    if (!user) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
     res.json(user);
   } catch (err) {
     console.log(err);
