@@ -23,17 +23,18 @@
           <button class="search-button" type="submit">🔍</button>
         </form>
       </div>
-      <button class="home-buttons" id="sign-out-button">Sign Out</button>
+      <button class="home-buttons" id="sign-out-button"><b>Sign Out</b></button>
     </header>
 
     <main>
       <div class="intro">
         <div id="app">
-          <h2>Your search results</h2>
-            <ul>
-              <li v-for="user in users">{{ user }}</li>
-            </ul>
+          <template v-for="user in users">
+            <h2>Your search results</h2>
+            <p>{{ user }}</p>
+          </template>
         </div>
+      </div>
     </main>
 
     <footer class="footer">
@@ -41,16 +42,52 @@
     </footer>
 
     <script>
-        window.onload = function () {
-          const usernameI = localStorage.getItem("username");
-          const app = new Vue({
-            el: "#app",
-            data: {
-              usernameI: usernameI,
-            },
-          });
-        };
-      </script>
+      window.onload = function () {
+        const usernameI = localStorage.getItem("username");
+        const app = new Vue({
+          el: "#app",
+          data: {
+            usernameI: usernameI,
+          },
+        });
 
+        // show the sign out button only if the user is authenticated
+        const signOutBtn = document.getElementById("sign-out-btn");
+        const token = document.cookie
+          .split(";")
+          .find((cookie) => cookie.trim().startsWith("jwt="));
+      };
+      if (token) {
+        // If a token is found, add the "sign out" button to the HTML document
+        signOutBtn.style.display = "block";
+      } else {
+        // If no token is found, hide the "sign out" button
+        signOutBtn.style.display = "none";
+      }
+      const signOutButton = document.getElementById("sign-out-button");
+      signOutButton.addEventListener("click", async (e) => {
+        const res = await fetch("http://localhost:3000/api/auth/signout", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((res) => {
+            return res.json();
+          })
+          .then((data) => {
+            if (data.message === "Successfully logged out") {
+              window.location.href = "index.html";
+            } else if (data.message === "Failed log out") {
+              alert(
+                "Something went wrong during logging out, please try again"
+              );
+            }
+          })
+          .catch((error) => {
+            console.error("Something went wrong during fetch: ", error);
+          });
+      });
+    </script>
   </body>
 </html>

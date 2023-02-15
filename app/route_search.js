@@ -3,15 +3,15 @@ const router = express.Router();
 const db = require("./db.js");
 
 router.get("/search", async (req, res) => {
-  const mongo = db.getDb();
-  let query = req.query.q;
-  if (!query) {
-    return res.status(400).send({
-      error: "Bad Request",
-      message: "The query is required",
-    });
-  }
   try {
+    const mongo = db.getDb();
+    const query = req.query.q;
+    if (!query) {
+      return res.status(400).send({
+        error: "Bad Request",
+        message: "The query is required",
+      });
+    }
     let users = await mongo
       .collection("users")
       .find({
@@ -25,11 +25,8 @@ router.get("/search", async (req, res) => {
     return res.status(200).send({
       users: users,
     });
-  } catch (error) {
-    return res.status(500).send({
-      error: "Server Error",
-      message: error.message,
-    });
+  } catch (err) {
+    res.status(500).send({ error: "HTTP internal error" });
   }
 });
 

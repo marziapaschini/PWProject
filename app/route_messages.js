@@ -46,6 +46,7 @@ router.get("/messages/:userId/:idMsg", async (req, res) => {
   let message = await mongo
     .collection("messages")
     .findOne({ _id: msgId, author: user.username });
+  console.log(message);
   res.json(message);
 });
 

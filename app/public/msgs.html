@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>💬 Messages</title>
     <link rel="stylesheet" href="new_style.css" />
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11/dist/vue.js"></script>
+    <script src="https://unpkg.com/vue@2.6.14/dist/vue.min.js"></script>
+    <script src="https://unpkg.com/vue-router@3.5.2/dist/vue-router.min.js"></script>
   </head>
 
   <body>
@@ -20,10 +21,10 @@
             name="search"
             placeholder="Search users"
           />
-          <button class="search-button" type="submit">Go</button>
+          <button class="search-button" type="submit">🔍</button>
         </form>
       </div>
-      <button class="home-buttons" id="sign-out-button">Sign Out</button>
+      <button class="home-buttons" id="sign-out-button"><b>Sign Out</b></button>
     </header>
 
     <main>
@@ -37,6 +38,7 @@
             ⬅️ Go Back
           </button>
           <h3>All messages</h3>
+          <!--
           <div class="scrollable-container">
             <template>
               <div>
@@ -58,9 +60,10 @@
                       likes
                       <button id="likeButton">👍</button>
                       <button
+                        class="read-button"
                         id="oneMsgButton"
                         dataId="${message._id}"
-                        dataUser="${message.user}"
+                        dataUser="${message.author}"
                         style="color: white"
                       >
                         Read message
@@ -70,6 +73,9 @@
                 </ul>
               </div>
             </template>
+          </div>-->
+          <div id="app">
+            <router-view></router-view>
           </div>
         </div>
       </div>
@@ -80,14 +86,57 @@
     </footer>
 
     <script>
-      window.onload = function () {
+      /*
+            const signOutButton = document.getElementById("sign-out-button");
+            // Fetch the API to check if the user is authenticated
+            fetch("http://localhost:3000/api/auth/verify")
+              .then((response) => response.json())
+              .then((data) => {
+                if (data.isAuthenticated) {
+                  // If the user is authenticated, show the logout button
+                  signOutButton.style.display = "block";
+                } else {
+                  // If the user is not authenticated, hide the logout button
+                  signOutButton.style.display = "none";
+                }
+              })
+              .catch((error) => {
+                console.error(error);
+              });
+
+            // Sign out operation
+            signOutButton.addEventListener("click", async (e) => {
+              const res = await fetch("http://localhost:3000/api/auth/signout", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              })
+                .then((res) => {
+                  return res.json();
+                })
+                .then((data) => {
+                  if (data.message === "Successfully logged out") {
+                    window.location.href = "index.html";
+                  } else if (data.message === "Failed log out") {
+                    alert(
+                      "Something went wrong during logging out, please try again"
+                    );
+                  }
+                })
+                .catch((error) => {
+                  console.error("Something went wrong during fetch: ", error);
+                });
+            });
+      */
+      /* window.onload = function () {
         const app = new Vue({
           el: "#app",
           data: {
             messages: [],
             likes: [],
           },
-          created() {
+          mounted() {
             fetch("http://localhost:3000/api/social/messages", {
               method: "GET",
               headers: {
@@ -133,10 +182,51 @@
               return dateObject.toLocaleString();
             },
           },
+        });*/
+
+      fetch(`http://localhost:3000/api/social/messages/${userId}/${idMsg}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then((res) => {
+          console.log(res);
+          return res.json();
+        })
+        .then((message) => {
+          localStorage.setItem("messages", JSON.stringify(message));
+          window.location.href = "one_msg.html";
+        })
+        .catch((err) => {
+          console.error(err);
         });
-        const msgsContainer = document.querySelector(".scrollable-container");
-        msgsContainer.addEventListener("click", async (e) => {
-          const target = event.target;
+
+      const oneMsgBtn = document.getElementById("oneMsgButton");
+      oneMsgBtn.addEventListener("click", function (event) {
+        const messageId = event.target.getAttribute("dataId");
+        const messageAuthor = event.target.getAttribute("dataUser");
+        fetch(`http://localhost:3000/api/social/messages/${userId}/${idMsg}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((res) => {
+            console.log(res);
+            return res.json();
+          })
+          .then((message) => {
+            localStorage.setItem("message", JSON.stringify(message));
+            window.location.href = "one_msg.html";
+          })
+          .catch((err) => {
+            console.error(err);
+          });
+      });
+
+      /*  const msgsContainer = document.querySelector(".scrollable-container");
+             oneMsgBtn.addEventListener("click", async (e) => {
           if (target.id === "oneMsgButton") {
             event.preventDefault();
             const messageId = target.getAttribute("dataId");
@@ -184,24 +274,7 @@
             }
           }
         });
-      };
-    </script>
-
-    <script>
-      const searchForm = document.getElementById("search-form");
-      const searchInput = document.getElementById("search-input");
-      const searchResults = document.getElementById("search-results");
-
-      searchForm.addEventListener("submit", async function (event) {
-        event.preventDefault();
-        const query = searchInput.value;
-        const results = await fetch(
-          `http://localhost:3000/api/social/search?q=${query}`
-        ).then((res) => res.json());
-        searchResults.innerHTML = results
-          .map((result) => `<div>${result}</div>`)
-          .join("");
-      });
+      };*/
     </script>
   </body>
 </html>

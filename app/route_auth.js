@@ -58,7 +58,7 @@ router.post("/signin", async (req, res) => {
     res.status(500).json({ error: "HTTP internal server error" });
   }
 });
-
+/*
 router.get("/verify", async (req, res) => {
   try {
     const token = req.cookies.jwt;
@@ -70,6 +70,21 @@ router.get("/verify", async (req, res) => {
     }
   } catch (err) {
     res.status(401).json({ message: "Not authenticated" });
+  }
+});
+*/
+
+router.get("/verify", async (req, res) => {
+  try {
+    const token = req.cookies.jwt;
+    if (!token) {
+      res.status(401).json({ isAuthenticated: false });
+    } else {
+      const decoded = jwt.verify(token, "secret_key");
+      res.json({ isAuthenticated: true, username: decoded.id });
+    }
+  } catch (err) {
+    res.status(401).json({ isAuthenticated: false });
   }
 });
 

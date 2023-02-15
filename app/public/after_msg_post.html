@@ -5,60 +5,31 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>💬 Messagly</title>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="new_style.css" />
   </head>
 
   <body>
     <header class="header">
       <a href="index.html" class="logo">💬 Messagly</a>
-      <nav class="nav-items">
-        <a href="#">Contacts 📞</a>
-      </nav>
-      <div class="search-container">
-        <form action="/search">
-          <input type="text" placeholder="Search users" />
-          <button type="submit">🔎</button>
-        </form>
-      </div>
     </header>
+
     <div class="intro">
       <div class="main">
         <h3>Your message has been posted!</h3>
-        <p1>What do you want to do now?</p1>
       </div>
-      <button type="submit" id="posting">Post it</button>
+      <button id="homepageButton" class="home-buttons" onclick="toHomepage()">
+        🏠 Return to Homepage
+      </button>
     </div>
-
-    <script>
-      const post = document.getElementById("posting");
-      form.addEventListener("submit", async (event) => {
-        event.preventDefault();
-        const newMsg = document.getElementById("txt").value;
-        const res = await fetch("http://localhost:3000/api/social/messages", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ username, password }),
-        })
-          .then((res) => {
-            console.log(res);
-            return res.json();
-          })
-          .then((data) => {
-            //window.location.href = 
-          })
-          .catch((error) => {
-            console.error(
-              "There was a problem with the fetch operation:",
-              error
-            );
-          });
-      });
-    </script>
 
     <footer class="footer">
       <div class="copy">© 2023 Developer</div>
     </footer>
+
+    <script>
+      function toHomepage() {
+        window.location.href = "index.html";
+      }
+    </script>
   </body>
 </html>

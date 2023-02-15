@@ -16,7 +16,7 @@
             name="search"
             placeholder="Search users"
           />
-          <button class="search-button" type="submit">Go</button>
+          <button class="search-button" type="submit">🔍</button>
         </form>
       </div>
     </header>
@@ -32,8 +32,8 @@
         </button>
         <h3>Message</h3>
         <div id="app" class="app">
-          <template>
-            <div class="post">
+          <div id="post" class="post">
+            <template>
               <div class="post-header">
                 <div class="post-author">{{ message.author }}</div>
                 <div class="post-date">{{ formatDate(message.date) }}</div>
@@ -44,15 +44,24 @@
                 likes
                 <button id="likeButton">👍</button>
               </div>
-            </div>
-          </template>
+            </template>
+          </div>
         </div>
       </div>
     </main>
-    
+
     <script>
       window.onload = function () {
-        const messageId = localStorage.getItem("message");
+        const messages = JSON.parse(localStorage.getItem("messages"));
+
+        const message = new Vue({
+          el: "#post",
+          data: {
+            message: message
+          }
+        });
+
+        /* const messageId = localStorage.getItem("message");
         const userId = localStorage.getItem("username");
         const message = JSON.parse(localStorage.getItem("message"));
 
@@ -68,7 +77,7 @@
           const btnState = localStorage.getItem("likeBtnState");
           likeButton.innerHTML = btnState || "Like";
           likeButton.addEventListener("click", function () {
-            const message = localStorage.getItem("message");
+          //  const message = localStorage.getItem("message");
             const messageObject = JSON.parse(message);
             const messageId = messageObject._id;
             alert(messageId);
@@ -104,7 +113,7 @@
           })
           .catch((error) => {
             console.error("Error during the authentication verify: ", error);
-          });
+          });*/
       };
     </script>
   </body>

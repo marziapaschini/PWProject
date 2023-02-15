@@ -20,10 +20,10 @@
             name="search"
             placeholder="Search users"
           />
-          <button class="search-button" type="submit">Go</button>
+          <button class="search-button" type="submit">🔍</button>
         </form>
       </div>
-      <button class="home-buttons" id="sign-out-button">Sign Out</button>
+      <button class="home-buttons" id="sign-out-button"><b>Sign Out</b></button>
     </header>
 
     <main>
@@ -33,7 +33,7 @@
           onclick="window.history.back()"
           style="color: white; position: absolute; top: 100px; left: 45px"
         >
-          ⬅️ Go Back
+          <b>⬅️ Go Back</b>
         </button>
         <div id="app">
           <h1 id="welcomeText">Welcome, {{ userData.username }}!</h1>
@@ -49,7 +49,7 @@
                   id="goToProfile"
                   onclick="toProfile()"
                 >
-                  <b>Your profile</b>
+                  <b>🔘 Your profile</b>
                 </button>
               </div>
               <div>
@@ -109,6 +109,8 @@
               .catch((error) => console.error(error));
           },
         });
+
+        // Sign out operation
         const signOutButton = document.getElementById("sign-out-button");
         signOutButton.addEventListener("click", async (e) => {
           const res = await fetch("http://localhost:3000/api/auth/signout", {

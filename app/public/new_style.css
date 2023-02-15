@@ -68,6 +68,8 @@ body {
   color: white;
   border-radius: 5px;
   font-size: 20px;
+  font-weight: bold;
+  flex-direction: row;
   padding: 10px 25px;
   margin: 15px;
   cursor: pointer;
@@ -82,6 +84,10 @@ body {
 .buttons {
   display: flex;
   justify-content: center;
+}
+
+.read-button {
+  font-weight: bold;
 }
 
 /* intro */

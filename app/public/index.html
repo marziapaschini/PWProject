@@ -19,9 +19,11 @@
             name="search"
             placeholder="Search users"
           />
-          <button class="search-button" type="submit">Go</button>
+          <button class="search-button" type="submit">🔍</button>
         </form>
       </div>
+      <!-- Only show the "Sign Out" button if the user is authenticated. -->
+      <button id="sign-out-button" class="home-buttons">Sign Out</button>
     </header>
     <main>
       <div class="intro">
@@ -34,11 +36,27 @@
           <button class="home-buttons" onclick="toAllMsgs()">
             Take a look
           </button>
-          <p2>Enjoy Messagly Community</p2>
-          <div class="buttons">
-            <button class="home-buttons" onclick="toSignIn()">Sign in</button>
+          <!-- Only show the "Sign In" and "Sign Up" buttons if the user is not authenticated. -->
+          <p2 id="login-message">Enjoy Messagly Community</p2>
+          <div id="login-buttons" class="buttons">
+            <button id="signInButton" class="home-buttons" onclick="toSignIn()">
+              Sign In
+            </button>
             <p2>or</p2>
-            <button class="home-buttons" onclick="toSignUp()">Sign up</button>
+            <button
+              id="signOutButton"
+              class="home-buttons"
+              onclick="toSignUp()"
+            >
+              Sign Up
+            </button>
+            <button
+              id="goToYourProfileButton"
+              class="home-buttons"
+              onclick="toYourProfile()"
+            >
+              Sign Up
+            </button>
           </div>
         </div>
       </div>
@@ -49,6 +67,61 @@
     </footer>
 
     <script>
+      // Get a reference to the login buttons container
+      const loginButtons = document.getElementById("login-buttons");
+      const loginMessage = document.getElementById("login-message");
+      const signOutButton = document.getElementById("sign-out-button");
+      const yourProfileButton = document.getElementById(
+        "goToYourProfileButton"
+      );
+
+      // Fetch the API to check if the user is authenticated
+      fetch("http://localhost:3000/api/auth/verify")
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.isAuthenticated) {
+            // If the user is authenticated, hide the login buttons
+            loginButtons.style.display = "none";
+            loginMessage.style.display = "none";
+            signOutButton.style.display = "block";
+            yourProfileButton.style.display = "block";
+          } else {
+            // If the user is not authenticated, show the login buttons
+            loginButtons.style.display = "block";
+            loginMessage.style.display = "block";
+            signOutButton.style.display = "none";
+            yourProfileButton.style.display = "none";
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+
+      // Sign out operation
+      signOutButton.addEventListener("click", async (e) => {
+        const res = await fetch("http://localhost:3000/api/auth/signout", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((res) => {
+            return res.json();
+          })
+          .then((data) => {
+            if (data.message === "Successfully logged out") {
+              window.location.href = "index.html";
+            } else if (data.message === "Failed log out") {
+              alert(
+                "Something went wrong during logging out, please try again"
+              );
+            }
+          })
+          .catch((error) => {
+            console.error("Something went wrong during fetch: ", error);
+          });
+      });
+
       function toAllMsgs() {
         window.location.href = "msgs.html";
       }
