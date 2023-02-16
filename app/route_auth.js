@@ -12,30 +12,38 @@ router.post("/signup", async (req, res) => {
     const user = await mongo
       .collection("users")
       .findOne({ username: username });
-    console.log(userData);
     if (user) {
       res.status(409).json({ message: "Already existing user, please Login" });
-    } else if (user.username === "" || user.password === "") {
-      res.status(401)({ message: "Missing credentials" });
+    } else if (
+      !userData.username ||
+      !userData.password ||
+      !userData.name ||
+      !userData.surname ||
+      !userData.bio
+    ) {
+      res.status(401).json({ message: "Missing credentials" });
     } else {
       const last = await mongo
         .collection("users")
         .findOne({}, { sort: { _id: -1 } });
       let lastId = last?._id === undefined ? 0 : last._id;
       lastId++;
-      console.log(lastId);
       userData._id = lastId;
+      console.log(userData);
       await mongo.collection("users").insertOne(userData);
+      const token = jwt.sign({ id: userData.username }, "secret_key", {
+        expiresIn: 86400,
+      });
+      res.cookie("jwt", token, { httpOnly: true });
       res.json({ message: "New user added" });
     }
   } catch (error) {
-    res.status(500).json({ msg: "Internal error" });
+    res.status(500).json({ message: "HTTP internal server error" });
   }
 });
 
 router.post("/signin", async (req, res) => {
   try {
-    console.log(req.body);
     const mongo = db.getDb();
     const username = req.body.username;
     const password = req.body.password;
@@ -58,6 +66,7 @@ router.post("/signin", async (req, res) => {
     res.status(500).json({ error: "HTTP internal server error" });
   }
 });
+
 /*
 router.get("/verify", async (req, res) => {
   try {
@@ -74,6 +83,7 @@ router.get("/verify", async (req, res) => {
 });
 */
 
+/* Additional API to verify if a user is authenticated */
 router.get("/verify", async (req, res) => {
   try {
     const token = req.cookies.jwt;
@@ -88,6 +98,7 @@ router.get("/verify", async (req, res) => {
   }
 });
 
+/* Additional API to log out an authenticated user */
 router.post("/signout", (req, res) => {
   try {
     const token = req.cookies.jwt;
@@ -108,7 +119,7 @@ router.post("/signout", (req, res) => {
     }
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Failed to log out" });
+    res.status(500).json({ message: "Failed log out" });
   }
 });
 

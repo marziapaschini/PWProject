@@ -11,18 +11,7 @@
   <body>
     <header class="header">
       <a href="index.html" class="logo">💬 Messagly</a>
-      <div class="search-container">
-        <form class="search-form" action="#" method="get">
-          <input
-            type="text"
-            id="search"
-            name="search"
-            placeholder="Search users"
-          />
-          <button class="search-button" type="submit">Go</button>
-        </form>
-      </div>
-      <button class="home-buttons" id="sign-out-button">Sign Out</button>
+      <!--  <button class="home-buttons" id="sign-out-button">Sign Out</button> -->
     </header>
     <div class="intro">
       <button
@@ -64,6 +53,33 @@
             console.error(error);
           });
 
+        // Lascio o tolgo il pulsante per sign out?
+        // Sign out operation
+        const signOutButton = document.getElementById("sign-out-button");
+        signOutButton.addEventListener("click", async (e) => {
+          const res = await fetch("http://localhost:3000/api/auth/signout", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
+            .then((res) => {
+              return res.json();
+            })
+            .then((data) => {
+              if (data.message === "Successfully logged out") {
+                window.location.href = "index.html";
+              } else if (data.message === "Failed log out") {
+                alert(
+                  "Something went wrong during logging out, please try again"
+                );
+              }
+            })
+            .catch((error) => {
+              console.error("Something went wrong during fetch: ", error);
+            });
+        });
+
         const post = document.getElementById("posting");
         post.addEventListener("click", async (e) => {
           e.preventDefault();
@@ -73,14 +89,13 @@
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ text }),
+            body: JSON.stringify({ text: newMsg }),
           })
             .then((res) => {
               return res.json();
             })
             .then((data) => {
-              alert("Your message has been posted!");
-              window.location.href = "msgs.html";
+              window.location.href = "after_msg_post.html";
             })
             .catch((error) => {
               console.error("Something went wrong during fetch: ", error);

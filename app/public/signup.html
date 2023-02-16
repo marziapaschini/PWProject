@@ -24,13 +24,13 @@
         </button>
         <div class="form-container">
           <h2>Sign Up</h2>
-          <form>
+          <form id="signUpForm">
             <div class="form-group">
-              <input type="text" placeholder="Name" required />
-              <input type="text" placeholder="Surname" required />
-              <input type="username" placeholder="Username" required />
-              <input type="password" placeholder="Password" required />
-              <input type="text" placeholder="Bio" required />
+              <input id="name" type="text" placeholder="Name" required />
+              <input id="surname" type="text" placeholder="Surname" required />
+              <input id="username" type="username" placeholder="Username" required />
+              <input id="password" type="password" placeholder="Password" required />
+              <input id="bio" type="text" placeholder="Bio" required />
             </div>
             <input type="submit" value="Sign Up" />
           </form>
@@ -38,17 +38,21 @@
       </div>
     </main>
 
+    <footer class="footer">
+      <div class="copy">© 2023 Developer</div>
+    </footer>
+
     <script>
       window.onload = function () {
         const form = document.getElementById("signUpForm");
         if (form) {
-          form.addEventListener("submit", async (event) => {
-            event.preventDefault();
+          form.addEventListener("submit", async (e) => {
+            e.preventDefault();
             const name = document.getElementById("name").value;
             const surname = document.getElementById("surname").value;
             const username = document.getElementById("username").value;
             const password = document.getElementById("password").value;
-            const bio = document.getElementById("about").value;
+            const bio = document.getElementById("bio").value;
             const updatedUsername = localStorage.setItem(
               "updatedUsername",
               username
@@ -58,21 +62,13 @@
               headers: {
                 "Content-Type": "application/json",
               },
-              body: JSON.stringify({ name, surname, username, password, bio }),
+              body: JSON.stringify({ username, password, name, surname, bio }),
             })
               .then((res) => {
                 return res.json();
               })
               .then((data) => {
                 if (data.message === "New user added") {
-                  /*  const expiration = new Date();
-                expiration.setDate(expiration.getDate() + 7);
-                document.cookie = `jwt=${
-                  data.token
-                }; expires=${expiration.toUTCString()}; path=/`;
-                document.cookie = `user=${JSON.stringify(
-                  data.user
-                )}; expires=${expiration.toUTCString()}; path=/`; */
                   window.location.href = "after_login.html";
                 } else if (
                   data.message === "Already existing user, please Login"
@@ -92,9 +88,5 @@
         }
       };
     </script>
-
-    <footer class="footer">
-      <div class="copy">© 2023 Developer</div>
-    </footer>
   </body>
 </html>

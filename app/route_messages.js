@@ -1,18 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const db = require("./db.js");
+const jwt = require("jsonwebtoken");
 
-router.post("/messages/", async (req, res) => {
+router.get("/messages/", async (req, res) => {
   const mongo = db.getDb();
-  const message = req.body;
-  let currentDate = new Date();
-  const last = await mongo
-    .collection("messages")
-    .findOne({}, { sort: { id: -1 } });
-  let lastId = last?.id !== undefined ? last.id : 0;
-  lastId++;
-  await mongo.collection("messages").insertOne(message);
-  res.json(message);
+  let allMessages = await mongo.collection("messages").find({}).toArray();
+  res.json(allMessages);
 });
 
 router.get("/messages/:userId", async (req, res) => {
@@ -29,6 +23,37 @@ router.get("/messages/:userId", async (req, res) => {
     .find({ author: user.username })
     .toArray();
   res.json(userMessages);
+});
+
+router.post("/messages/", async (req, res) => {
+  try {
+    const mongo = db.getDb();
+    const token = req.cookies.jwt;
+    const decoded = jwt.verify(token, "secret_key");
+    const userWhoPosts = await mongo
+      .collection("users")
+      .findOne({ username: decoded.id });
+    if (!userWhoPosts) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+    const message = req.body.text;
+    let currentDate = new Date();
+    const last = await mongo
+      .collection("messages")
+      .findOne({}, { sort: { _id: -1 } });
+    let lastId = last?._id !== undefined ? last._id : 0;
+    lastId++;
+    const newMessage = {
+      _id: lastId,
+      date: currentDate,
+      text: message,
+      author: userWhoPosts.username,
+    };
+    await mongo.collection("messages").insertOne(newMessage);
+    res.json(newMessage);
+  } catch (err) {
+    return res.status(500).json({ error: "HTTP internal server error" });
+  }
 });
 
 router.get("/messages/:userId/:idMsg", async (req, res) => {
@@ -48,12 +73,6 @@ router.get("/messages/:userId/:idMsg", async (req, res) => {
     .findOne({ _id: msgId, author: user.username });
   console.log(message);
   res.json(message);
-});
-
-router.get("/messages/", async (req, res) => {
-  const mongo = db.getDb();
-  let allMessages = await mongo.collection("messages").find({}).toArray();
-  res.json(allMessages);
 });
 
 module.exports = router;
