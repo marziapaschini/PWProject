@@ -90,6 +90,10 @@ body {
   font-weight: bold;
 }
 
+#goToYourProfileButton {
+  display: block;
+}
+
 /* intro */
 .intro {
   display: flex;

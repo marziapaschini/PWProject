@@ -34,13 +34,13 @@
             thoughts.
           </p2>
           <button class="home-buttons" onclick="toAllMsgs()">
-            Take a look
+            💬 Take a look
           </button>
           <!-- Only show the "Sign In" and "Sign Up" buttons if the user is not authenticated. -->
           <p2 id="login-message">Enjoy Messagly Community</p2>
           <div id="login-buttons" class="buttons">
             <button id="signInButton" class="home-buttons" onclick="toSignIn()">
-              Sign In
+              ⏩ Sign In
             </button>
             <p2>or</p2>
             <button
@@ -48,14 +48,16 @@
               class="home-buttons"
               onclick="toSignUp()"
             >
-              Sign Up
+              ▶️ Sign Up
             </button>
+          </div>
+          <div style="display: flex; justify-content: center">
             <button
-              id="goToYourProfileButton"
+              id="toYourProfileButton"
               class="home-buttons"
               onclick="toYourProfile()"
             >
-              Sign Up
+              🔘 See your Profile
             </button>
           </div>
         </div>
@@ -71,9 +73,7 @@
       const loginButtons = document.getElementById("login-buttons");
       const loginMessage = document.getElementById("login-message");
       const signOutButton = document.getElementById("sign-out-button");
-      const yourProfileButton = document.getElementById(
-        "goToYourProfileButton"
-      );
+      const yourProfileButton = document.getElementById("toYourProfileButton");
 
       // Fetch the API to check if the user is authenticated
       fetch("http://localhost:3000/api/auth/verify")
@@ -130,6 +130,9 @@
       }
       function toSignUp() {
         window.location.href = "signup.html";
+      }
+      function toYourProfile() {
+        window.location.href = "user_profile.html";
       }
     </script>
   </body>
