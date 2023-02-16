@@ -48,32 +48,44 @@ body {
 }
 
 .search-button {
-  padding: 10px 20px;
-  margin: 10px 0;
-  border-radius: 45px;
   background-color: #4eb6c9;
+  border-radius: 45px;
   color: white;
-  font-size: 16px;
-  width: 20%;
   float: right;
+  font-size: 16px;
+  margin: 10px 0;
+  padding: 10px 20px;
+  width: 20%;
 }
 
 .search-buttons:hover {
   background-color: #30a8bd;
 }
 
+.info-button {
+  background-color: #4eb6c9;
+  border-radius: 25px;
+  color: white;
+  flex-direction: row;
+  font-size: 20px;
+  font-weight: bold;
+  margin: 15px;
+  padding: 10px 25px;
+  box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.4);
+}
+
 /* buttons */
 .home-buttons {
   background-color: #4eb6c9;
-  color: white;
+  border: none;
   border-radius: 5px;
+  color: white;
+  cursor: pointer;
+  flex-direction: row;
   font-size: 20px;
   font-weight: bold;
-  flex-direction: row;
-  padding: 10px 25px;
   margin: 15px;
-  cursor: pointer;
-  border: none;
+  padding: 10px 25px;
   box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.4);
 }
 
@@ -263,7 +275,7 @@ a {
 }
 
 /* messages */
-li.post {
+.post {
   background-color: #f2f2f2;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
   border-radius: 10px;

@@ -6,7 +6,6 @@ const jwt = require("jsonwebtoken");
 router.get("/whoami", async (req, res) => {
   try {
     const token = req.cookies.jwt;
-    console.log(token);
     const decoded = jwt.verify(token, "secret_key");
     const mongo = db.getDb();
     const user = await mongo

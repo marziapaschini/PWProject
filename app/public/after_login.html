@@ -23,7 +23,8 @@
           <button class="search-button" type="submit">🔍</button>
         </form>
       </div>
-      <button class="home-buttons" id="sign-out-button">Sign Out</button>
+      <!--  <button class="info-button" id="info-button">ℹ️ Info</button>-->
+      <button class="home-buttons" id="sign-out-button">⏏️ Sign Out</button>
     </header>
 
     <main>
@@ -108,6 +109,7 @@
             console.error(error);
           });
 
+        // Set the page
         const usernameI = localStorage.getItem("username");
         const app = new Vue({
           el: "#app",

@@ -70,6 +70,7 @@ router.delete("/like/:idMessage", async (req, res) => {
   }
 });
 
+/* Additional API to get the message's number of likes */
 router.get("/like/:idMessage", async (req, res) => {
   const mongo = db.getDb();
   const idMsg = !isNaN(parseInt(req.params.idMessage))

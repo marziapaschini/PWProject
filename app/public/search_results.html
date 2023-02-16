@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>💬 Search results</title>
     <link rel="stylesheet" href="new_style.css" />
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
   </head>
 
   <body>
@@ -23,26 +23,67 @@
           <button class="search-button" type="submit">🔍</button>
         </form>
       </div>
-      <button class="home-buttons" id="sign-out-button"><b>Sign Out</b></button>
+      <!-- Only show the "Sign Out" button if the user is authenticated. 
+      <button class="home-buttons" id="sign-out-button"><b>⏏️ Sign Out</b></button>-->
     </header>
-
+    <!--
     <main>
-      <div class="intro">
+      
         <div id="app">
           <template v-for="user in users">
             <h2>Your search results</h2>
             <p>{{ user }}</p>
           </template>
         </div>
-      </div>
+      
     </main>
-
+-->
+    <div class="intro">
+      <div id="app">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Surname</th>
+              <th>Username</th>
+            </tr>
+          </thead>
+          <tbody>
+            <div id="results">
+              <!-- Results will be displayed here -->
+            </div>
+          </tbody>
+        </table>
+      </div>
+    </div>
     <footer class="footer">
       <div class="copy">© 2023 Developer</div>
     </footer>
 
     <script>
-      window.onload = function () {
+      const message = document.querySelector("#message");
+
+      // Set the page
+      const searchedUsers = JSON.parse(localStorage.getItem("searchedUsers"));
+      const app = new Vue({
+        el: "#results",
+        data: {
+          users: [],
+        },
+        mounted() {
+          const query = document.querySelector("#q").value;
+          fetch(`http://localhost:3000/api/social/search?q=${query}`)
+            .then((response) => response.json())
+            .then((searchedUsers) => {
+              this.users = searchedUsers;
+              if (app.users.length === 0) {
+                message.style.display = "block";
+              }
+            });
+        },
+      });
+
+      /*   window.onload = function () {
         const usernameI = localStorage.getItem("username");
         const app = new Vue({
           el: "#app",
@@ -51,43 +92,50 @@
           },
         });
 
+        
         // show the sign out button only if the user is authenticated
-        const signOutBtn = document.getElementById("sign-out-btn");
-        const token = document.cookie
-          .split(";")
-          .find((cookie) => cookie.trim().startsWith("jwt="));
-      };
-      if (token) {
-        // If a token is found, add the "sign out" button to the HTML document
-        signOutBtn.style.display = "block";
-      } else {
-        // If no token is found, hide the "sign out" button
-        signOutBtn.style.display = "none";
-      }
-      const signOutButton = document.getElementById("sign-out-button");
-      signOutButton.addEventListener("click", async (e) => {
-        const res = await fetch("http://localhost:3000/api/auth/signout", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        })
-          .then((res) => {
-            return res.json();
-          })
+        const signOutButton = document.getElementById("sign-out-button");
+        // Fetch the API to check if the user is authenticated
+        fetch("http://localhost:3000/api/auth/verify")
+          .then((response) => response.json())
           .then((data) => {
-            if (data.message === "Successfully logged out") {
-              window.location.href = "index.html";
-            } else if (data.message === "Failed log out") {
-              alert(
-                "Something went wrong during logging out, please try again"
-              );
+            if (data.isAuthenticated) {
+              // If the user is authenticated, show the sign out button
+              signOutButton.style.display = "block";
+            } else {
+              // If the user is not authenticated, hide the sign out button
+              signOutButton.style.display = "none";
             }
           })
           .catch((error) => {
-            console.error("Something went wrong during fetch: ", error);
+            console.error(error);
           });
-      });
+
+        // Sign out operation
+        signOutButton.addEventListener("click", async (e) => {
+          const res = await fetch("http://localhost:3000/api/auth/signout", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
+            .then((res) => {
+              return res.json();
+            })
+            .then((data) => {
+              if (data.message === "Successfully logged out") {
+                window.location.href = "index.html";
+              } else if (data.message === "Failed log out") {
+                alert(
+                  "Something went wrong during logging out, please try again"
+                );
+              }
+            })
+            .catch((error) => {
+              console.error("Something went wrong during fetch: ", error);
+            });
+        });
+      };*/
     </script>
   </body>
 </html>

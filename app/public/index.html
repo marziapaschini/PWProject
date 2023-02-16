@@ -19,11 +19,13 @@
             name="search"
             placeholder="Search users"
           />
-          <button class="search-button" type="submit">🔍</button>
+          <button id="search-button" class="search-button" type="submit">
+            🔍
+          </button>
         </form>
       </div>
       <!-- Only show the "Sign Out" button if the user is authenticated. -->
-      <button id="sign-out-button" class="home-buttons">Sign Out</button>
+      <button id="sign-out-button" class="home-buttons">⏏️ Sign Out</button>
     </header>
     <main>
       <div class="intro">
@@ -69,11 +71,14 @@
     </footer>
 
     <script>
-      // Get a reference to the login buttons container
+      // Get references to the buttons
       const loginButtons = document.getElementById("login-buttons");
       const loginMessage = document.getElementById("login-message");
       const signOutButton = document.getElementById("sign-out-button");
       const yourProfileButton = document.getElementById("toYourProfileButton");
+
+      const searchButton = document.getElementById("search-button");
+      const searchInput = document.getElementById("search");
 
       // Fetch the API to check if the user is authenticated
       fetch("http://localhost:3000/api/auth/verify")
@@ -99,6 +104,7 @@
 
       // Sign out operation
       signOutButton.addEventListener("click", async (e) => {
+        e.preventDefault();
         const res = await fetch("http://localhost:3000/api/auth/signout", {
           method: "POST",
           headers: {
@@ -118,7 +124,29 @@
             }
           })
           .catch((error) => {
-            console.error("Something went wrong during fetch: ", error);
+            console.error(
+              "Something went wrong during fetch to sign out: ",
+              error
+            );
+          });
+      });
+
+      // Search operation
+      searchButton.addEventListener("click", async (e) => {
+        e.preventDefault();
+        const query = searchInput.value;
+        fetch(`http://localhost:3000/api/social/search?q=${query}`)
+          .then((response) => response.json())
+          .then((searchedUsers) => {
+            this.users = searchedUsers;
+            localStorage.setItem("searchedUsers", searchedUsers);
+            window.location.href = "search_results.html";
+          })
+          .catch((error) => {
+            console.error(
+              "Something went wrong during fetch to search: ",
+              error
+            );
           });
       });
 

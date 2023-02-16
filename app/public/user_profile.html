@@ -23,7 +23,7 @@
           <button class="search-button" type="submit">🔍</button>
         </form>
       </div>
-      <button class="home-buttons" id="sign-out-button">Sign Out</button>
+      <button class="home-buttons" id="sign-out-button">⏏️ Sign Out</button>
     </header>
     <div class="intro">
       <button
@@ -94,6 +94,7 @@
             console.error(error);
           });
 
+        // Set the page
         const usernameI = localStorage.getItem("username");
         const app = new Vue({
           el: "#app",
@@ -109,6 +110,8 @@
               .catch((error) => console.error(error));
           },
         });
+
+        // Sign out operation
         const signOutButton = document.getElementById("sign-out-button");
         signOutButton.addEventListener("click", async (e) => {
           const res = await fetch("http://localhost:3000/api/auth/signout", {

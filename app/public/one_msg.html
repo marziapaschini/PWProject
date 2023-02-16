@@ -7,7 +7,7 @@
   </head>
   <body>
     <header class="header">
-      <a href="index.html" class="logo">💬 Messagly</a>
+      <a href="index.html" class="logo">💬 Message</a>
       <div class="search-container">
         <form class="search-form" action="#" method="get">
           <input
@@ -32,19 +32,17 @@
         </button>
         <h3>Message</h3>
         <div id="app" class="app">
-          <div id="post" class="post">
-            <template>
-              <div class="post-header">
-                <div class="post-author">{{ message.author }}</div>
-                <div class="post-date">{{ formatDate(message.date) }}</div>
-              </div>
-              <div class="post-content">{{ message.text }}</div>
-              <div class="likes">
-                <span id="like-count">{{ likes[message._id] }}</span>
-                likes
-                <button id="likeButton">👍</button>
-              </div>
-            </template>
+          <div class="post">
+            <div class="post-header">
+              <div class="post-author">{{ message.author }}</div>
+              <div class="post-date">{{ formatDate(message.date) }}</div>
+            </div>
+            <div class="post-content">{{ message.text }}</div>
+            <div class="likes">
+              <span id="like-count">{{ likes[message._id].count }}</span>
+              likes
+              <button id="likeButton">👍</button>
+            </div>
           </div>
         </div>
       </div>
@@ -52,13 +50,31 @@
 
     <script>
       window.onload = function () {
-        const messages = JSON.parse(localStorage.getItem("messages"));
-
-        const message = new Vue({
-          el: "#post",
+        const app = new Vue({
+          el: "#app",
           data: {
-            message: message
-          }
+            message: {},
+            likes: {},
+          },
+          mounted() {
+            const message = JSON.parse(localStorage.getItem("message"));
+            this.message = message;
+            fetch(
+              `http://localhost:3000/api/social/like/${message._id}`
+            )
+              .then((res) => {
+                return res.json();
+              })
+              .then((likes) => {
+                this.$set(this.likes, message._id, likes);
+              });
+          },
+          methods: {
+            formatDate(date) {
+              const dateObject = new Date(date);
+              return dateObject.toLocaleString();
+            },
+          },
         });
 
         /* const messageId = localStorage.getItem("message");

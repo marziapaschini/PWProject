@@ -7,7 +7,6 @@
     <title>💬 Messages</title>
     <link rel="stylesheet" href="new_style.css" />
     <script src="https://unpkg.com/vue@2.6.14/dist/vue.min.js"></script>
-    <script src="https://unpkg.com/vue-router@3.5.2/dist/vue-router.min.js"></script>
   </head>
 
   <body>
@@ -24,58 +23,45 @@
           <button class="search-button" type="submit">🔍</button>
         </form>
       </div>
-      <button class="home-buttons" id="sign-out-button"><b>Sign Out</b></button>
+      <button class="home-buttons" id="sign-out-button">⏏️ Sign Out</button>
     </header>
 
     <main>
-      <div id="app">
-        <div class="intro">
-          <button
-            class="home-buttons"
-            onclick="window.history.back()"
-            style="color: white; position: absolute; top: 100px; left: 45px"
-          >
-            ⬅️ Go Back
-          </button>
-          <h3>All messages</h3>
-          <!--
+      <div class="intro">
+        <button
+          class="home-buttons"
+          onclick="window.history.back()"
+          style="color: white; position: absolute; top: 100px; left: 45px"
+        >
+          ⬅️ Go Back
+        </button>
+        <h3>All messages</h3>
+        <div id="app">
           <div class="scrollable-container">
-            <template>
+            <template v-for="message in messages">
               <div>
-                <ul>
-                  <li
-                    class="post"
-                    v-for="message in messages"
-                    :key="message._id"
-                  >
-                    <div class="post-header">
-                      <div class="post-author">{{ message.author }}</div>
-                      <div class="post-date">
-                        {{ formatDate(message.date) }}
-                      </div>
-                    </div>
-                    <div class="post-content">{{ message.text }}</div>
-                    <div class="likes">
-                      <span id="like-count">{{ likes[message._id] }}</span>
-                      likes
-                      <button id="likeButton">👍</button>
-                      <button
-                        class="read-button"
-                        id="oneMsgButton"
-                        dataId="${message._id}"
-                        dataUser="${message.author}"
-                        style="color: white"
-                      >
-                        Read message
-                      </button>
-                    </div>
-                  </li>
-                </ul>
+                <div class="post">
+                  <div class="post-header">
+                    <div class="post-author">{{ message.author }}</div>
+                    <div class="post-date">{{ formatDate(message.date) }}</div>
+                  </div>
+                  <div class="post-content">{{ message.text }}</div>
+                  <div class="likes">
+                    <span id="like-count">{{ likes[message._id].count }}</span>
+                    likes
+                    <button id="likeButton">👍</button>
+                    <button
+                      class="read-button"
+                      id="oneMsgButton"
+                      v-on:click="readMessage(message._id, message.author)"
+                      style="color: white"
+                    >
+                      Read message
+                    </button>
+                  </div>
+                </div>
               </div>
             </template>
-          </div>-->
-          <div id="app">
-            <router-view></router-view>
           </div>
         </div>
       </div>
@@ -86,142 +72,118 @@
     </footer>
 
     <script>
-      /*
-            const signOutButton = document.getElementById("sign-out-button");
-            // Fetch the API to check if the user is authenticated
-            fetch("http://localhost:3000/api/auth/verify")
-              .then((response) => response.json())
-              .then((data) => {
-                if (data.isAuthenticated) {
-                  // If the user is authenticated, show the logout button
-                  signOutButton.style.display = "block";
-                } else {
-                  // If the user is not authenticated, hide the logout button
-                  signOutButton.style.display = "none";
-                }
-              })
-              .catch((error) => {
-                console.error(error);
-              });
-
-            // Sign out operation
-            signOutButton.addEventListener("click", async (e) => {
-              const res = await fetch("http://localhost:3000/api/auth/signout", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-              })
-                .then((res) => {
-                  return res.json();
-                })
-                .then((data) => {
-                  if (data.message === "Successfully logged out") {
-                    window.location.href = "index.html";
-                  } else if (data.message === "Failed log out") {
-                    alert(
-                      "Something went wrong during logging out, please try again"
-                    );
-                  }
-                })
-                .catch((error) => {
-                  console.error("Something went wrong during fetch: ", error);
-                });
-            });
-      */
-      /* window.onload = function () {
-        const app = new Vue({
-          el: "#app",
-          data: {
-            messages: [],
-            likes: [],
-          },
-          mounted() {
-            fetch("http://localhost:3000/api/social/messages", {
-              method: "GET",
-              headers: {
-                "Content-Type": "application/json",
-              },
+      const app = new Vue({
+        el: "#app",
+        data: {
+          messages: [],
+          likes: {},
+        },
+        mounted() {
+          fetch("http://localhost:3000/api/social/messages")
+            .then((res) => {
+              return res.json();
             })
+            .then((messages) => {
+              this.messages = messages;
+              messages.forEach((message) => {
+                fetch(`http://localhost:3000/api/social/like/${message._id}`)
+                  .then((res) => {
+                    return res.json();
+                  })
+                  .then((likes) => {
+                    this.$set(this.likes, message._id, likes);
+                  });
+                /*   localStorage.setItem(
+                  `message${message._id}`,
+                  `message${message._id}`
+                );*/
+              });
+            })
+            .catch((error) => console.error(error));
+        },
+        methods: {
+          formatDate(date) {
+            const dateObject = new Date(date);
+            return dateObject.toLocaleString();
+          },
+
+          readMessage(idMsg, userId) {
+            fetch(
+              `http://localhost:3000/api/social/messages/${userId}/${idMsg}`
+            )
               .then((res) => {
                 console.log(res);
                 return res.json();
               })
-              .then((data) => {
-                console.log("Data from API:", data);
-                this.messages = data;
-                console.log(this.message);
-                this.messages.forEach((message) => {
-                  this.likes[message._id] = 0;
-                  fetch(
-                    `http://localhost:3000/api/social/like/${message._id}`,
-                    {
-                      method: "GET",
-                      headers: {
-                        "Content-Type": "application/json",
-                      },
-                    }
-                  )
-                    .then((res) => res.json())
-                    .then((data) => {
-                      console.log("Data from like API:", data);
-                      this.likes[message._id] = data.likes;
-                    })
-                    .catch((error) => {
-                      console.error(error);
-                    });
-                });
+              .then((message) => {
+                localStorage.setItem("message", JSON.stringify(message));
+                window.location.href = "one_msg.html";
               })
-              .catch((error) => {
-                console.error(error);
+              .catch((err) => {
+                console.error(err);
               });
           },
-          methods: {
-            formatDate(date) {
-              const dateObject = new Date(date);
-              return dateObject.toLocaleString();
-            },
-          },
-        });*/
-
-      fetch(`http://localhost:3000/api/social/messages/${userId}/${idMsg}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
         },
-      })
-        .then((res) => {
-          console.log(res);
-          return res.json();
-        })
-        .then((message) => {
-          localStorage.setItem("messages", JSON.stringify(message));
-          window.location.href = "one_msg.html";
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-
+      });
+      /*
       const oneMsgBtn = document.getElementById("oneMsgButton");
-      oneMsgBtn.addEventListener("click", function (event) {
-        const messageId = event.target.getAttribute("dataId");
-        const messageAuthor = event.target.getAttribute("dataUser");
-        fetch(`http://localhost:3000/api/social/messages/${userId}/${idMsg}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        })
+      oneMsgBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        const idMsg = event.target.getAttribute("dataId");
+        const userId = event.target.getAttribute("dataUser");
+        fetch(`http://localhost:3000/api/social/messages/${userId}/${idMsg}`)
           .then((res) => {
             console.log(res);
             return res.json();
           })
           .then((message) => {
-            localStorage.setItem("message", JSON.stringify(message));
+            localStorage.getItem(`message${idMsg}`, JSON.stringify(message));
             window.location.href = "one_msg.html";
           })
           .catch((err) => {
             console.error(err);
+          });
+      });*/
+
+      const signOutButton = document.getElementById("sign-out-button");
+      // Fetch the API to check if the user is authenticated
+      fetch("http://localhost:3000/api/auth/verify")
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.isAuthenticated) {
+            // If the user is authenticated, show the logout button
+            signOutButton.style.display = "block";
+          } else {
+            // If the user is not authenticated, hide the logout button
+            signOutButton.style.display = "none";
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+
+      // Sign out operation
+      signOutButton.addEventListener("click", async (e) => {
+        const res = await fetch("http://localhost:3000/api/auth/signout", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((res) => {
+            return res.json();
+          })
+          .then((data) => {
+            if (data.message === "Successfully logged out") {
+              window.location.href = "index.html";
+            } else if (data.message === "Failed log out") {
+              alert(
+                "Something went wrong during logging out, please try again"
+              );
+            }
+          })
+          .catch((error) => {
+            console.error("Something went wrong during fetch: ", error);
           });
       });
 
