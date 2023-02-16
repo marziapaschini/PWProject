@@ -6,27 +6,32 @@ router.get("/search", async (req, res) => {
   try {
     const mongo = db.getDb();
     const query = req.query.q;
-    if (!query) {
-      return res.status(400).send({
-        error: "Bad Request",
-        message: "The query is required",
-      });
-    }
-    let users = await mongo
+    console.log(query);
+    const regexQuery = new RegExp(query, "i");
+    const users = await mongo
       .collection("users")
-      .find({
-        $or: [
-          { username: { $regex: query, $options: "i" } },
-          { name: { $regex: query, $options: "i" } },
-          { surname: { $regex: query, $options: "i" } },
-        ],
-      })
+      .find(
+        {
+          $or: [
+            { name: regexQuery },
+            { surname: regexQuery },
+            { username: regexQuery },
+          ],
+        },
+        {
+          projection: {
+            _id: 1,
+            name: 1,
+            surname: 1,
+            username: 1,
+          },
+        }
+      )
       .toArray();
-    return res.status(200).send({
-      users: users,
-    });
+    res.json(users);
   } catch (err) {
-    res.status(500).send({ error: "HTTP internal error" });
+    console.error(err);
+    res.status(500).send({ error: "HTTP internal server error" });
   }
 });
 
