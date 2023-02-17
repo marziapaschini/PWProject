@@ -53,7 +53,7 @@
                     <button
                       class="read-button"
                       id="oneMsgButton"
-                      v-on:click="readMessage(message._id, message.author)"
+                      v-on:click="readMessage(message.authorId, message._id)"
                       style="color: white"
                     >
                       Read message
@@ -93,10 +93,6 @@
                   .then((likes) => {
                     this.$set(this.likes, message._id, likes);
                   });
-                /*   localStorage.setItem(
-                  `message${message._id}`,
-                  `message${message._id}`
-                );*/
               });
             })
             .catch((error) => console.error(error));
@@ -106,8 +102,7 @@
             const dateObject = new Date(date);
             return dateObject.toLocaleString();
           },
-
-          readMessage(idMsg, userId) {
+          readMessage(userId, idMsg) {
             fetch(
               `http://localhost:3000/api/social/messages/${userId}/${idMsg}`
             )
@@ -116,8 +111,11 @@
                 return res.json();
               })
               .then((message) => {
-                localStorage.setItem("message", JSON.stringify(message));
-                window.location.href = "one_msg.html";
+                localStorage.setItem(
+                  `message-${message._id}`,
+                  JSON.stringify(message)
+                );
+                window.location.href = `one_msg.html?id=${message._id}`;
               })
               .catch((err) => {
                 console.error(err);

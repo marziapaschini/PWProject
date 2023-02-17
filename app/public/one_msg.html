@@ -19,6 +19,7 @@
           <button class="search-button" type="submit">🔍</button>
         </form>
       </div>
+      <button class="home-buttons" id="sign-out-button">⏏️ Sign Out</button>
     </header>
 
     <main>
@@ -49,45 +50,83 @@
     </main>
 
     <script>
-      window.onload = function () {
-        const app = new Vue({
-          el: "#app",
-          data: {
-            message: {},
-            likes: {},
-          },
-          mounted() {
-            const message = JSON.parse(localStorage.getItem("message"));
+      const app = new Vue({
+        el: "#app",
+        data: {
+          message: {},
+          likes: {},
+        },
+        mounted() {
+          console.log("Mounted");
+          const urlParams = new URLSearchParams(window.location.search);
+          const messageId = urlParams.get("id");
+          console.log(`Message ID: ${messageId}`);
+          const message = JSON.parse(
+            localStorage.getItem(`message-${messageId}`)
+          );
+          if (message !== null) {
             this.message = message;
-            fetch(
-              `http://localhost:3000/api/social/like/${message._id}`
-            )
+            console.log("Message from local storage", message);
+            fetch(`http://localhost:3000/api/social/like/${message._id}`)
               .then((res) => {
                 return res.json();
               })
               .then((likes) => {
                 this.$set(this.likes, message._id, likes);
               });
+          }
+        },
+        methods: {
+          formatDate(date) {
+            const dateObject = new Date(date);
+            return dateObject.toLocaleString();
           },
-          methods: {
-            formatDate(date) {
-              const dateObject = new Date(date);
-              return dateObject.toLocaleString();
-            },
-          },
+        },
+      });
+
+      const signOutButton = document.getElementById("sign-out-button");
+      // Fetch the API to check if the user is authenticated
+      fetch("http://localhost:3000/api/auth/verify")
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.isAuthenticated) {
+            // If the user is authenticated, show the logout button
+            signOutButton.style.display = "block";
+          } else {
+            // If the user is not authenticated, hide the logout button
+            signOutButton.style.display = "none";
+          }
+        })
+        .catch((error) => {
+          console.error(error);
         });
 
-        /* const messageId = localStorage.getItem("message");
-        const userId = localStorage.getItem("username");
-        const message = JSON.parse(localStorage.getItem("message"));
-
-        const messageUserId = new Vue({
-          el: "#app",
-          data: {
-            message: message,
+      // Sign out operation
+      signOutButton.addEventListener("click", async (e) => {
+        const res = await fetch("http://localhost:3000/api/auth/signout", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
-        });
+        })
+          .then((res) => {
+            return res.json();
+          })
+          .then((data) => {
+            if (data.message === "Successfully logged out") {
+              window.location.href = "index.html";
+            } else if (data.message === "Failed log out") {
+              alert(
+                "Something went wrong during logging out, please try again"
+              );
+            }
+          })
+          .catch((error) => {
+            console.error("Something went wrong during fetch: ", error);
+          });
+      });
 
+      /*
         const likeButton = document.getElementById("likeButton");
         if (likeButton) {
           const btnState = localStorage.getItem("likeBtnState");
@@ -130,7 +169,6 @@
           .catch((error) => {
             console.error("Error during the authentication verify: ", error);
           });*/
-      };
     </script>
   </body>
 </html>

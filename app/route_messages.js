@@ -3,9 +3,39 @@ const router = express.Router();
 const db = require("./db.js");
 const jwt = require("jsonwebtoken");
 
+/* Simple get-all-messages API
 router.get("/messages/", async (req, res) => {
   const mongo = db.getDb();
   let allMessages = await mongo.collection("messages").find({}).toArray();
+  res.json(allMessages);
+});*/
+
+/* API to get all messages and the relative user ID for each message
+   in order to make vue.js work in the single message visualization  */
+router.get("/messages", async (req, res) => {
+  const mongo = db.getDb();
+  const allMessages = await mongo
+    .collection("messages")
+    .aggregate([
+      {
+        $lookup: {
+          from: "users",
+          localField: "author",
+          foreignField: "username",
+          as: "authorInfo",
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          date: 1,
+          text: 1,
+          author: 1,
+          authorId: "$authorInfo._id",
+        },
+      },
+    ])
+    .toArray();
   res.json(allMessages);
 });
 
