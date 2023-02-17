@@ -23,7 +23,9 @@
           <button class="search-button" type="submit">🔍</button>
         </form>
       </div>
-      <button class="home-buttons" id="sign-out-button">⏏️ Sign Out</button>
+      <button class="home-buttons" id="sign-out-button" v-if="isAuthenticated">
+        ⏏️ Sign Out
+      </button>
     </header>
 
     <main>
@@ -48,8 +50,7 @@
                   <div class="post-content">{{ message.text }}</div>
                   <div class="likes">
                     <span id="like-count">{{ likes[message._id].count }}</span>
-                    likes
-                    <button id="likeButton">👍</button>
+                    👍
                     <button
                       class="read-button"
                       id="oneMsgButton"
@@ -72,169 +73,97 @@
     </footer>
 
     <script>
-      const app = new Vue({
-        el: "#app",
-        data: {
-          messages: [],
-          likes: {},
-        },
-        mounted() {
-          fetch("http://localhost:3000/api/social/messages")
+      window.onload = function () {
+        const app = new Vue({
+          el: "#app",
+          data: {
+            messages: [],
+            likes: {},
+            isAuthenticated: false,
+          },
+          mounted() {
+            fetch("http://localhost:3000/api/social/messages")
+              .then((res) => {
+                return res.json();
+              })
+              .then((messages) => {
+                this.messages = messages;
+                messages.forEach((message) => {
+                  fetch(`http://localhost:3000/api/social/like/${message._id}`)
+                    .then((res) => {
+                      return res.json();
+                    })
+                    .then((likes) => {
+                      this.$set(this.likes, message._id, {
+                        count: likes.count,
+                      });
+                    });
+                });
+              })
+              .catch((error) => console.error(error));
+            // Fetch the API to check if the user is authenticated
+            fetch("http://localhost:3000/api/auth/verify")
+              .then((response) => response.json())
+              .then((data) => {
+                this.isAuthenticated = data.isAuthenticated;
+              })
+              .catch((error) => {
+                console.error(error);
+              });
+          },
+          methods: {
+            formatDate(date) {
+              const dateObject = new Date(date);
+              return dateObject.toLocaleString();
+            },
+            readMessage(userId, idMsg) {
+              fetch(
+                `http://localhost:3000/api/social/messages/${userId}/${idMsg}`
+              )
+                .then((res) => {
+                  console.log(res);
+                  return res.json();
+                })
+                .then((message) => {
+                  localStorage.setItem(
+                    `message-${message._id}`,
+                    JSON.stringify(message)
+                  );
+                  window.location.href = `one_msg.html?id=${message._id}`;
+                })
+                .catch((err) => {
+                  console.error(err);
+                });
+            },
+          },
+        });
+
+        const signOutButton = document.getElementById("sign-out-button");
+        // Sign out operation
+        signOutButton.addEventListener("click", async (e) => {
+          const res = await fetch("http://localhost:3000/api/auth/signout", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
             .then((res) => {
               return res.json();
             })
-            .then((messages) => {
-              this.messages = messages;
-              messages.forEach((message) => {
-                fetch(`http://localhost:3000/api/social/like/${message._id}`)
-                  .then((res) => {
-                    return res.json();
-                  })
-                  .then((likes) => {
-                    this.$set(this.likes, message._id, likes);
-                  });
-              });
+            .then((data) => {
+              if (data.message === "Successfully logged out") {
+                window.location.href = "index.html";
+              } else if (data.message === "Failed log out") {
+                alert(
+                  "Something went wrong during logging out, please try again"
+                );
+              }
             })
-            .catch((error) => console.error(error));
-        },
-        methods: {
-          formatDate(date) {
-            const dateObject = new Date(date);
-            return dateObject.toLocaleString();
-          },
-          readMessage(userId, idMsg) {
-            fetch(
-              `http://localhost:3000/api/social/messages/${userId}/${idMsg}`
-            )
-              .then((res) => {
-                console.log(res);
-                return res.json();
-              })
-              .then((message) => {
-                localStorage.setItem(
-                  `message-${message._id}`,
-                  JSON.stringify(message)
-                );
-                window.location.href = `one_msg.html?id=${message._id}`;
-              })
-              .catch((err) => {
-                console.error(err);
-              });
-          },
-        },
-      });
-      /*
-      const oneMsgBtn = document.getElementById("oneMsgButton");
-      oneMsgBtn.addEventListener("click", function (e) {
-        e.preventDefault();
-        const idMsg = event.target.getAttribute("dataId");
-        const userId = event.target.getAttribute("dataUser");
-        fetch(`http://localhost:3000/api/social/messages/${userId}/${idMsg}`)
-          .then((res) => {
-            console.log(res);
-            return res.json();
-          })
-          .then((message) => {
-            localStorage.getItem(`message${idMsg}`, JSON.stringify(message));
-            window.location.href = "one_msg.html";
-          })
-          .catch((err) => {
-            console.error(err);
-          });
-      });*/
-
-      const signOutButton = document.getElementById("sign-out-button");
-      // Fetch the API to check if the user is authenticated
-      fetch("http://localhost:3000/api/auth/verify")
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.isAuthenticated) {
-            // If the user is authenticated, show the logout button
-            signOutButton.style.display = "block";
-          } else {
-            // If the user is not authenticated, hide the logout button
-            signOutButton.style.display = "none";
-          }
-        })
-        .catch((error) => {
-          console.error(error);
+            .catch((error) => {
+              console.error("Something went wrong during fetch: ", error);
+            });
         });
-
-      // Sign out operation
-      signOutButton.addEventListener("click", async (e) => {
-        const res = await fetch("http://localhost:3000/api/auth/signout", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        })
-          .then((res) => {
-            return res.json();
-          })
-          .then((data) => {
-            if (data.message === "Successfully logged out") {
-              window.location.href = "index.html";
-            } else if (data.message === "Failed log out") {
-              alert(
-                "Something went wrong during logging out, please try again"
-              );
-            }
-          })
-          .catch((error) => {
-            console.error("Something went wrong during fetch: ", error);
-          });
-      });
-
-      /*  const msgsContainer = document.querySelector(".scrollable-container");
-             oneMsgBtn.addEventListener("click", async (e) => {
-          if (target.id === "oneMsgButton") {
-            event.preventDefault();
-            const messageId = target.getAttribute("dataId");
-            const userId = target.getAttribute("dataUser");
-            const res = await fetch(
-              `http://localhost:3000/api/social/messages/${userId}/${messageId}`
-            );
-            const message = await res.json();
-            localStorage.setItem("message", JSON.stringify(message));
-            window.location.href = `http://localhost:3000/one_msg.html`;
-          }
-          if (target.id === "likeButton") {
-            event.preventDefault();
-            const messageId = target.getAttribute("dataId");
-            const userId = target.getAttribute("dataUser");
-            const res = await fetch(
-              `http://localhost:3000/api/social/like/${messageId}`,
-              {
-                method: "POST",
-              }
-            );
-            const message = await res.json();
-            localStorage.setItem("message", JSON.stringify(message));
-            if (target.id === "likeButton") {
-              event.preventDefault();
-              const messageId = target.getAttribute("dataId");
-              const userId = target.getAttribute("dataUser");
-              if (target.innerHTML === "Like") {
-                target.innerHTML = "Unlike";
-                const res = await fetch(
-                  `http://localhost:3000/api/social/like/${messageId}`,
-                  {
-                    method: "POST",
-                  }
-                );
-              } else {
-                target.innerHTML = "Like";
-                const res = await fetch(
-                  `http://localhost:3000/api/social/like/${messageId}`,
-                  {
-                    method: "DELETE",
-                  }
-                );
-              }
-            }
-          }
-        });
-      };*/
+      };
     </script>
   </body>
 </html>

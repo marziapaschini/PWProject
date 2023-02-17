@@ -41,8 +41,8 @@
             <div class="post-content">{{ message.text }}</div>
             <div class="likes">
               <span id="like-count">{{ likes[message._id].count }}</span>
-              likes
-              <button id="likeButton">👍</button>
+              👍
+              <button id="likeButton" style="color: white">Like</button>
             </div>
           </div>
         </div>
@@ -127,6 +127,79 @@
       });
 
       /*
+likeMessage(messageId) {
+              fetch(`http://localhost:3000/api/social/like/${messageId}`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({}),
+              })
+                .then((res) => {
+                  return res.json();
+                })
+                .then((like) => {
+                  this.likes[messageId].count++;
+                })
+                .catch((error) => {
+                  console.error(
+                    "Something went wrong during fetch to put like: ",
+                    error
+                  );
+                });
+            },
+
+
+toggleLike(messageId) {
+              const likes = this.likes[messageId];
+              if (likes.liked) {
+                // Unlike the message
+                fetch(`http://localhost:3000/api/social/like/${messageId}`, {
+                  method: "DELETE",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({}),
+                })
+                  .then((res) => {
+                    return res.json();
+                  })
+                  .then(() => {
+                    likes.liked = false;
+                    likes.count--;
+                  })
+                  .catch((error) => {
+                    console.error(
+                      "Something went wrong during fetch to unlike: ",
+                      error
+                    );
+                  });
+              } else {
+                // Like the message
+                fetch(`http://localhost:3000/api/social/like/${messageId}`, {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({}),
+                })
+                  .then((res) => {
+                    return res.json();
+                  })
+                  .then(() => {
+                    likes.liked = true;
+                    likes.count++;
+                  })
+                  .catch((error) => {
+                    console.error(
+                      "Something went wrong during fetch to like: ",
+                      error
+                    );
+                  });
+              }
+            },
+
+
         const likeButton = document.getElementById("likeButton");
         if (likeButton) {
           const btnState = localStorage.getItem("likeBtnState");
@@ -169,6 +242,46 @@
           .catch((error) => {
             console.error("Error during the authentication verify: ", error);
           });*/
+
+      /*  const msgsContainer = document.querySelector(".scrollable-container");
+             oneMsgBtn.addEventListener("click", async (e) => {
+          if (target.id === "likeButton") {
+            event.preventDefault();
+            const messageId = target.getAttribute("dataId");
+            const userId = target.getAttribute("dataUser");
+            const res = await fetch(
+              `http://localhost:3000/api/social/like/${messageId}`,
+              {
+                method: "POST",
+              }
+            );
+            const message = await res.json();
+            localStorage.setItem("message", JSON.stringify(message));
+            if (target.id === "likeButton") {
+              event.preventDefault();
+              const messageId = target.getAttribute("dataId");
+              const userId = target.getAttribute("dataUser");
+              if (target.innerHTML === "Like") {
+                target.innerHTML = "Unlike";
+                const res = await fetch(
+                  `http://localhost:3000/api/social/like/${messageId}`,
+                  {
+                    method: "POST",
+                  }
+                );
+              } else {
+                target.innerHTML = "Like";
+                const res = await fetch(
+                  `http://localhost:3000/api/social/like/${messageId}`,
+                  {
+                    method: "DELETE",
+                  }
+                );
+              }
+            }
+          }
+        });
+      };*/
     </script>
   </body>
 </html>
