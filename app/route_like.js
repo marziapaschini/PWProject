@@ -18,6 +18,15 @@ router.post("/like/:idMessage", async (req, res) => {
     const userWhoLikes = await mongo
       .collection("users")
       .findOne({ username: decoded.id });
+    const existingLike = await mongo
+      .collection("like")
+      .findOne({ username_user: userWhoLikes.username, id_message: idMsg });
+    if (existingLike) {
+      // User has already liked this message
+      return res
+        .status(400)
+        .send({ error: "User has already liked this message" });
+    }
     const like = await mongo
       .collection("like")
       .findOne({}, { sort: { _id: -1 } });
@@ -43,7 +52,6 @@ router.post("/like/:idMessage", async (req, res) => {
 router.delete("/like/:idMessage", async (req, res) => {
   try {
     const token = req.cookies.jwt;
-    console.log(token);
     const decoded = jwt.verify(token, "secret_key");
     const mongo = db.getDb();
     const idMsg = !isNaN(parseInt(req.params.idMessage))
@@ -55,15 +63,13 @@ router.delete("/like/:idMessage", async (req, res) => {
     const userWhoDislikes = await mongo
       .collection("users")
       .findOne({ username: decoded.id });
-    console.log(userWhoDislikes);
     const likeToRemove = await mongo
       .collection("like")
-      .findOne({ username_user: userWhoDislikes, _id: idMsg });
-    console.log(likeToRemove);
+      .findOne({ username_user: userWhoDislikes.username, id_message: idMsg });
     if (!likeToRemove) {
       return res.status(404).send({ error: "Non-existing like" });
     }
-    let newLikes = await mongo.collection("likes").deleteOne(likeToRemove);
+    let newLikes = await mongo.collection("like").deleteOne(likeToRemove);
     res.json(newLikes);
   } catch (err) {
     console.log(err);

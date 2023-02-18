@@ -92,6 +92,11 @@
                   fetch(`http://localhost:3000/api/social/like/${message._id}`)
                     .then((res) => {
                       return res.json();
+                      localStorage.getItem(
+                        `message-${message._id}-likes-${
+                          likes[message._id].count
+                        }`
+                      );
                     })
                     .then((likes) => {
                       this.$set(this.likes, message._id, {
@@ -139,6 +144,22 @@
         });
 
         const signOutButton = document.getElementById("sign-out-button");
+        // Fetch the API to check if the user is authenticated
+        fetch("http://localhost:3000/api/auth/verify")
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.isAuthenticated) {
+              // If the user is authenticated, show the logout button
+              signOutButton.style.display = "block";
+            } else {
+              // If the user is not authenticated, hide the logout button
+              signOutButton.style.display = "none";
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+
         // Sign out operation
         signOutButton.addEventListener("click", async (e) => {
           const res = await fetch("http://localhost:3000/api/auth/signout", {

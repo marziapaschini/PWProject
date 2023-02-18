@@ -23,7 +23,7 @@
           <button class="search-button" type="submit">🔍</button>
         </form>
       </div>
-      <button class="home-buttons" id="sign-out-button"><b>Sign Out</b></button>
+      <button class="home-buttons" id="sign-out-button">⏏️ Sign Out</button>
     </header>
 
     <main>
@@ -33,7 +33,7 @@
           onclick="window.history.back()"
           style="color: white; position: absolute; top: 100px; left: 45px"
         >
-          <b>⬅️ Go Back</b>
+          ⬅️ Go Back
         </button>
         <h3>Your feed</h3>
         <div class="scrollable-container">
@@ -46,8 +46,16 @@
                 </div>
                 <div class="post-content">{{ message.text }}</div>
                 <div class="likes">
-                  <span id="like-count">0</span> likes
-                  <button id="likeButton">👍</button>
+                  <span id="like-count">{{ likes[message._id].count }}</span>
+                  👍
+                  <button
+                    class="read-button"
+                    id="oneMsgButton"
+                    v-on:click="readMessage(message.authorId, message._id)"
+                    style="color: white"
+                  >
+                    Read message
+                  </button>
                 </div>
               </div>
             </template>
@@ -80,15 +88,39 @@
           el: "#app",
           data: {
             messages: [],
-            like: [],
+            likes: {},
+            isAuthenticated: false,
           },
-          created() {
+          mounted() {
             fetch("http://localhost:3000/api/social/feed")
               .then((res) => {
                 return res.json();
               })
+              .then((messages) => {
+                this.messages = messages;
+                messages.forEach((message) => {
+                  fetch(`http://localhost:3000/api/social/like/${message._id}`)
+                    .then((res) => {
+                      return res.json();
+                      localStorage.getItem(
+                        `message-${message._id}-likes-${
+                          likes[message._id].count
+                        }`
+                      );
+                    })
+                    .then((likes) => {
+                      this.$set(this.likes, message._id, {
+                        count: likes.count,
+                      });
+                    });
+                });
+              })
+              .catch((error) => console.error(error));
+            // Fetch the API to check if the user is authenticated
+            fetch("http://localhost:3000/api/auth/verify")
+              .then((response) => response.json())
               .then((data) => {
-                this.messages = data;
+                this.isAuthenticated = data.isAuthenticated;
               })
               .catch((error) => {
                 console.error(error);
@@ -99,58 +131,28 @@
               const dateObject = new Date(date);
               return dateObject.toLocaleString();
             },
+            readMessage(userId, idMsg) {
+              fetch(
+                `http://localhost:3000/api/social/messages/${userId}/${idMsg}`
+              )
+                .then((res) => {
+                  console.log(res);
+                  return res.json();
+                })
+                .then((message) => {
+                  localStorage.setItem(
+                    `message-${message._id}`,
+                    JSON.stringify(message)
+                  );
+                  window.location.href = `one_msg.html?id=${message._id}`;
+                })
+                .catch((err) => {
+                  console.error(err);
+                });
+            },
           },
         });
-        const msgsContainer = document.querySelector(".scrollable-container");
-        msgsContainer.addEventListener("click", async (e) => {
-          const target = event.target;
-          if (target.id === "oneMsgButton") {
-            event.preventDefault();
-            const messageId = target.getAttribute("dataId");
-            const userId = target.getAttribute("dataUser");
-            const res = await fetch(
-              `http://localhost:3000/api/social/messages/${userId}/${messageId}`
-            );
-            const message = await res.json();
-            localStorage.setItem("message", JSON.stringify(message));
-            window.location.href = `http://localhost:3000/one_msg.html`;
-          }
-          if (target.id === "likeButton") {
-            event.preventDefault();
-            const messageId = target.getAttribute("dataId");
-            const userId = target.getAttribute("dataUser");
-            const res = await fetch(
-              `http://localhost:3000/api/social/like/${messageId}`,
-              {
-                method: "POST",
-              }
-            );
-            const message = await res.json();
-            localStorage.setItem("message", JSON.stringify(message));
-            if (target.id === "likeButton") {
-              event.preventDefault();
-              const messageId = target.getAttribute("dataId");
-              const userId = target.getAttribute("dataUser");
-              if (target.innerHTML === "Like") {
-                target.innerHTML = "Unlike";
-                const res = await fetch(
-                  `http://localhost:3000/api/social/like/${messageId}`,
-                  {
-                    method: "POST",
-                  }
-                );
-              } else {
-                target.innerHTML = "Like";
-                const res = await fetch(
-                  `http://localhost:3000/api/social/like/${messageId}`,
-                  {
-                    method: "DELETE",
-                  }
-                );
-              }
-            }
-          }
-        });
+
         const signOutButton = document.getElementById("sign-out-button");
         signOutButton.addEventListener("click", async (e) => {
           const res = await fetch("http://localhost:3000/api/auth/signout", {

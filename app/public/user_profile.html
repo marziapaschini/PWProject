@@ -62,9 +62,7 @@
         <button class="home-buttons" onclick="toYourMsgs()">
           💬 Your messages
         </button>
-        <button class="home-buttons" onclick="toFeed()">
-          👁️‍🗨️ Your feed
-        </button>
+        <button class="home-buttons" onclick="toFeed()">👁️‍🗨️ Your feed</button>
         <button class="home-buttons" onclick="toFollowers()">
           👥 Your followers
         </button>
@@ -108,6 +106,18 @@
                 this.userData = data;
               })
               .catch((error) => console.error(error));
+            fetch(`http://localhost:3000/api/social/followers/${userData._id}`)
+              .then((response) => response.json())
+              .then((followers) => {
+                this.followers = followers;
+              /*  const followersList = [];
+                followers.forEach((follower) => {
+                  followersList[i] = JSON.stringify(follower);
+                  i++;
+                });
+                localStorage.setItem("followersList", followersList);*/
+                localStorage.setItem("followers", JSON.stringify(followers));
+              });
           },
         });
 

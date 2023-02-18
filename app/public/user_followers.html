@@ -20,10 +20,10 @@
             name="search"
             placeholder="Search users"
           />
-          <button class="search-button" type="submit"><b>🔍</b></button>
+          <button class="search-button" type="submit">🔍</button>
         </form>
       </div>
-      <button class="home-buttons" id="sign-out-button"><b>⏏️ Sign Out</b></button>
+      <button class="home-buttons" id="sign-out-button">⏏️ Sign Out</button>
     </header>
 
     <main>
@@ -54,13 +54,16 @@
 
     <script>
       window.onload = function () {
-        const followersList = new Vue({
-          el: "#followers-container",
+        const followers = JSON.parse(localStorage.getItem("followers"));
+        const app = new Vue({
+          el: "#app",
           data: {
             followers: followers,
           },
         });
+
         const signOutButton = document.getElementById("sign-out-button");
+        // Sign out operation
         signOutButton.addEventListener("click", async (e) => {
           const res = await fetch("http://localhost:3000/api/auth/signout", {
             method: "POST",
