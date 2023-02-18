@@ -39,8 +39,13 @@
         <div class="scrollable-container">
           <div id="app">
             <template v-for="follower in followers">
-              <div>
-                <p id="followerName">{{follower.follows}}</p>
+              <div class="profile">
+                <a
+                  href="profile.html"
+                  class="profile-link"
+                  @click="storeUsername(follower.follows)"
+                  >{{follower.follows}}</a
+                >
               </div>
             </template>
           </div>
@@ -59,6 +64,11 @@
           el: "#app",
           data: {
             followers: followers,
+          },
+          methods: {
+            storeUsername(username) {
+              localStorage.setItem("username", username);
+            },
           },
         });
 

@@ -26,116 +26,98 @@
       <!-- Only show the "Sign Out" button if the user is authenticated. 
       <button class="home-buttons" id="sign-out-button"><b>⏏️ Sign Out</b></button>-->
     </header>
-    <!--
-    <main>
-      
-        <div id="app">
+
+    <div class="intro">
+      <h3 style="margin-bottom: 0.25em">Search results</h3>
+      <p2 style="margin-top: 0.0001em; font-size: 25px"
+        >Click on the profile of the user you want to see</p2
+      >
+      <div id="app">
+        <div class="scrollable-container">
           <template v-for="user in users">
-            <h2>Your search results</h2>
-            <p>{{ user }}</p>
+            <div class="profile">
+              <a href="profile.html" class="profile-link"
+                >{{ user.username }}</a
+              >
+            </div>
           </template>
         </div>
-      
-    </main>
--->
-    <div class="intro">
-      <div id="app">
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Surname</th>
-              <th>Username</th>
-            </tr>
-          </thead>
-          <tbody>
-            <div id="results">
-              <!-- Results will be displayed here -->
-            </div>
-          </tbody>
-        </table>
       </div>
     </div>
-    <footer class="footer">
-      <div class="copy">© 2023 Developer</div>
-    </footer>
 
     <script>
-      const message = document.querySelector("#message");
-
-      // Set the page
-      const searchedUsers = JSON.parse(localStorage.getItem("searchedUsers"));
+      const users = JSON.parse(localStorage.getItem("searchedUsers"));
       const app = new Vue({
-        el: "#results",
+        el: "#app",
         data: {
-          users: [],
-        },
-        mounted() {
-          const query = document.querySelector("#q").value;
-          fetch(`http://localhost:3000/api/social/search?q=${query}`)
-            .then((response) => response.json())
-            .then((searchedUsers) => {
-              this.users = searchedUsers;
-              if (app.users.length === 0) {
-                message.style.display = "block";
-              }
-            });
+          users: users,
         },
       });
 
-      /*   window.onload = function () {
-        const usernameI = localStorage.getItem("username");
-        const app = new Vue({
-          el: "#app",
-          data: {
-            usernameI: usernameI,
-          },
-        });
-
-        
-        // show the sign out button only if the user is authenticated
-        const signOutButton = document.getElementById("sign-out-button");
-        // Fetch the API to check if the user is authenticated
-        fetch("http://localhost:3000/api/auth/verify")
-          .then((response) => response.json())
-          .then((data) => {
-            if (data.isAuthenticated) {
-              // If the user is authenticated, show the sign out button
-              signOutButton.style.display = "block";
-            } else {
-              // If the user is not authenticated, hide the sign out button
-              signOutButton.style.display = "none";
-            }
-          })
-          .catch((error) => {
-            console.error(error);
-          });
-
-        // Sign out operation
-        signOutButton.addEventListener("click", async (e) => {
-          const res = await fetch("http://localhost:3000/api/auth/signout", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          })
+      const profileLink = document.querySelectorAll(".profile-link");
+      profileLink.forEach((link) => {
+        link.addEventListener("click", (e) => {
+          const username = link.innerHTML;
+          localStorage.setItem("username", username);
+          fetch(`http://localhost:3000/api/social/users?q=${username}`)
             .then((res) => {
               return res.json();
             })
-            .then((data) => {
-              if (data.message === "Successfully logged out") {
-                window.location.href = "index.html";
-              } else if (data.message === "Failed log out") {
-                alert(
-                  "Something went wrong during logging out, please try again"
-                );
-              }
+            .then((userData) => {
+              localStorage.setItem("userData", JSON.stringify(userData));
+              window.location.href = "profile.html";
             })
             .catch((error) => {
-              console.error("Something went wrong during fetch: ", error);
+              console.error(error);
             });
         });
-      };*/
+      });
+
+      // Set the page
+      /*   
+              // show the sign out button only if the user is authenticated
+              const signOutButton = document.getElementById("sign-out-button");
+              // Fetch the API to check if the user is authenticated
+              fetch("http://localhost:3000/api/auth/verify")
+                .then((response) => response.json())
+                .then((data) => {
+                  if (data.isAuthenticated) {
+                    // If the user is authenticated, show the sign out button
+                    signOutButton.style.display = "block";
+                  } else {
+                    // If the user is not authenticated, hide the sign out button
+                    signOutButton.style.display = "none";
+                  }
+                })
+                .catch((error) => {
+                  console.error(error);
+                });
+
+              // Sign out operation
+              signOutButton.addEventListener("click", async (e) => {
+                const res = await fetch("http://localhost:3000/api/auth/signout", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                })
+                  .then((res) => {
+                    return res.json();
+                  })
+                  .then((data) => {
+                    if (data.message === "Successfully logged out") {
+                      window.location.href = "index.html";
+                    } else if (data.message === "Failed log out") {
+                      alert(
+                        "Something went wrong during logging out, please try again"
+                      );
+                    }
+                  })
+                  .catch((error) => {
+                    console.error("Something went wrong during fetch: ", error);
+                  });
+              });
+            };*/
     </script>
   </body>
 </html>

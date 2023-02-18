@@ -49,9 +49,8 @@ router.post("/followers/:userId", async (req, res) => {
       follows: userWhoFollowsUsername,
       isFollowed: userToFollowUsername,
     };
-    await mongo.collection("followers").insertOne(newFollower);
-    console.log(newFollower);
-    res.json(newFollower);
+    let followers = await mongo.collection("followers").insertOne(newFollower);
+    res.json(followers);
   } catch (error) {
     return res.status(500).json({ error: "HTTP internal server error" });
   }
@@ -78,6 +77,41 @@ router.delete("/followers/:id", async (req, res) => {
     res.json(followers);
   } catch (error) {
     return res.status(500).json({ error: "HTTP internal server error" });
+  }
+});
+
+/* Additional API to check if the authenticated user follows the user by his ID */
+router.get("/checkFollowing/:id", async (req, res) => {
+  try {
+    const mongo = db.getDb();
+    const token = req.cookies.jwt;
+    const decoded = jwt.verify(token, "secret_key");
+    const currentUser = await mongo
+      .collection("users")
+      .findOne({ username: decoded.id });
+    if (!currentUser) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+    const userToFollowId = !isNaN(parseInt(req.params.id))
+      ? parseInt(req.params.id)
+      : null;
+    if (!userToFollowId) {
+      return res.status(404).send({ error: "Invalid user ID" });
+    }
+    const userToFollow = await mongo
+      .collection("users")
+      .findOne({ _id: userToFollowId });
+    const isFollowing = await mongo.collection("followers").findOne({
+      follows: currentUser.username,
+      isFollowed: userToFollow.username,
+    });
+    if (!isFollowing) {
+      res.json({ following: false });
+    } else {
+      res.json({ following: true });
+    }
+  } catch (err) {
+    res.json({ message: "HTTP internal server error" });
   }
 });
 

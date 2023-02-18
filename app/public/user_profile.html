@@ -51,9 +51,7 @@
             </tr>
             <tr>
               <td class="p2">Bio:</td>
-              <td class="p3" style="width: 350px; overflow: scroll">
-                {{ userData.bio }}
-              </td>
+              <td class="p3" style="width: 350px">{{ userData.bio }}</td>
             </tr>
           </table>
         </div>
@@ -110,7 +108,7 @@
               .then((response) => response.json())
               .then((followers) => {
                 this.followers = followers;
-              /*  const followersList = [];
+                /*  const followersList = [];
                 followers.forEach((follower) => {
                   followersList[i] = JSON.stringify(follower);
                   i++;

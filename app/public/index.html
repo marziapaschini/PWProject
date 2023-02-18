@@ -6,23 +6,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>💬 Messagly</title>
     <link rel="stylesheet" href="new_style.css" />
+    <script src="https://unpkg.com/vue@next"></script>
   </head>
 
   <body>
     <header class="header">
       <a href="#" class="logo">💬 Messagly</a>
-      <div class="search-container">
-        <form class="search-form" action="#" method="get">
-          <input
-            type="text"
-            id="search"
-            name="search"
-            placeholder="Search users"
-          />
-          <button id="search-button" class="search-button" type="submit">
-            🔍
-          </button>
-        </form>
+      <div id="app">
+        <div class="search-container">
+          <form
+            id="search-form"
+            class="search-form"
+            v-on:submit.prevent="search"
+            action="search_results.html"
+            method="get"
+          >
+            <input
+              type="text"
+              id="search-input"
+              v-model="searchQuery"
+              name="search"
+              placeholder="Search users"
+              required
+            />
+            <button id="search-button" class="search-button" type="submit">
+              🔍
+            </button>
+          </form>
+        </div>
       </div>
       <!-- Only show the "Sign Out" button if the user is authenticated. -->
       <button id="sign-out-button" class="home-buttons">⏏️ Sign Out</button>
@@ -77,8 +88,28 @@
       const signOutButton = document.getElementById("sign-out-button");
       const yourProfileButton = document.getElementById("toYourProfileButton");
 
+      const searchForm = document.getElementById("search-form");
       const searchButton = document.getElementById("search-button");
-      const searchInput = document.getElementById("search");
+      const searchInput = document.getElementById("search-input");
+      /*
+      const app = Vue.createApp({
+        data() {
+          return {
+            searchQuery: "",
+          };
+        },
+        methods: {
+          search() {
+            if (this.searchQuery.length > 0) {
+              const searchForm = document.getElementById("search-form");
+              searchForm.action = "search_results.html?q=" + this.searchQuery;
+              searchForm.submit();
+            }
+          },
+        },
+      });
+
+      app.mount("#app");*/
 
       // Fetch the API to check if the user is authenticated
       fetch("http://localhost:3000/api/auth/verify")
@@ -131,15 +162,17 @@
           });
       });
 
+      
+
       // Search operation
-      searchButton.addEventListener("click", async (e) => {
+      searchForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         const query = searchInput.value;
         fetch(`http://localhost:3000/api/social/search?q=${query}`)
           .then((response) => response.json())
           .then((searchedUsers) => {
-            this.users = searchedUsers;
-            localStorage.setItem("searchedUsers", searchedUsers);
+            
+            localStorage.setItem("searchedUsers", JSON.stringify(searchedUsers));
             window.location.href = "search_results.html";
           })
           .catch((error) => {

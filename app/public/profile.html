@@ -23,24 +23,65 @@
           <button class="search-button" type="submit">🔍</button>
         </form>
       </div>
+      <!-- Only show the "Sign Out" button if the user is authenticated. -->
+      <button id="sign-out-button" class="home-buttons">⏏️ Sign Out</button>
     </header>
 
     <div class="intro">
+      <button
+        class="home-buttons"
+        onclick="window.history.back()"
+        style="color: white; position: absolute; top: 100px; left: 45px"
+      >
+        <b>⬅️ Go Back</b>
+      </button>
       <body>
         <div id="app">
           <div class="card">
-            <div id="profile-container" class="profile-container">
-              <template v-for="user in users">
-                <h2 id="username">Username: {{user.username}}</h2>
-                <p id="name">Name: {{user.name}}</p>
-                <p id="surname">Surname: {{user.surname}}</p>
-                <p id="bio">Bio: {{user.bio}}</p>
-              </template>
-              <button class="home-buttons" id="followerBtn">👥 Followers</button>
-              <button class="home-buttons" id="followBtn">➕ Follow</button>
-              <!--<button id = "unfollowBtn">Unfollow</button>-->
-              <button class="home-buttons" id="viewMsg">💬 Messages</button>
-            </div>
+            <h2 id="username">{{username}}</h2>
+            <table
+              style="
+                display: flex;
+                flex-direction: row;
+                justify-content: space-around;
+                align-items: center;
+              "
+            >
+              <tr>
+                <td class="p2">Name:</td>
+                <td class="p3">{{ userData.name }}</td>
+              </tr>
+              <tr>
+                <td class="p2">Surname:</td>
+                <td class="p3">{{ userData.surname }}</td>
+              </tr>
+              <tr>
+                <td class="p2">Bio:</td>
+                <td class="p3" style="width: 350px">{{ userData.bio }}</td>
+              </tr>
+            </table>
+            <button class="home-buttons" id="follower-button">
+              👥 Followers
+            </button>
+            <!-- Only show the "Follow"/"Unfollow" button if the user is authenticated. -->
+            <button
+              v-if="isAuthenticated"
+              class="home-buttons"
+              id="follow-button"
+              style="margin: 0 auto"
+            >
+              ➕ Follow</button
+            ><button
+              v-if="isAuthenticated"
+              class="home-buttons"
+              id="unfollow-button"
+              style="margin: 0 auto"
+            >
+              ➖ Unfollow
+            </button>
+            <button class="home-buttons" id="view-msgs-button">
+              💬 Messages
+            </button>
           </div>
         </div>
       </body>
@@ -48,33 +89,90 @@
 
     <script>
       window.onload = function () {
-        const users = JSON.parse(localStorage.getItem("users"));
-        const username = users[0].username;
-        localStorage.setItem("username", username);
-        const profile = new Vue({
-          el: "#profile-container",
+        const userDataObject = JSON.parse(localStorage.getItem("userData"));
+        const userData = userDataObject[0];
+        const username = localStorage.getItem("username");
+        const app = new Vue({
+          el: "#app",
           data: {
-            users: users,
-          },
-        });
-      };
-
-      window.onload = function () {
-        const users = JSON.parse(localStorage.getItem("users"));
-        const username = users[0].username;
-        localStorage.setItem("username", username);
-        const profile = new Vue({
-          el: "#profile-container",
-          data: {
-            users: users,
+            userData: userData,
+            username: username,
           },
         });
 
-        const button = document.getElementById("followerBtn");
-        button.addEventListener("click", async (e) => {
+        // Check if the authenticated user is following the user
+        fetch(`http://localhost:3000/api/social/checkFollowing/${userData._id}`)
+          .then((response) => response.json())
+          .then((data) => {
+            // If the user is already following the profile, show the unfollow button
+            if (data.following) {
+              followButton.style.display = "none";
+              unfollowButton.style.display = "block";
+            }
+            // If the user is not following the profile, show the follow button
+            else {
+              followButton.style.display = "block";
+              unfollowButton.style.display = "none";
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+
+        const signOutButton = document.getElementById("sign-out-button");
+        const followButton = document.getElementById("follow-button");
+        const unfollowButton = document.getElementById("unfollow-button");
+        // Fetch the API to check if the user is authenticated
+        fetch("http://localhost:3000/api/auth/verify")
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.isAuthenticated) {
+              // If the user is authenticated, show the logout button
+              signOutButton.style.display = "block";
+            } else {
+              // If the user is not authenticated, hide the logout button
+              signOutButton.style.display = "none";
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+
+        // Sign out operation
+        signOutButton.addEventListener("click", async (e) => {
+          e.preventDefault();
+          const res = await fetch("http://localhost:3000/api/auth/signout", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
+            .then((res) => {
+              return res.json();
+            })
+            .then((data) => {
+              if (data.message === "Successfully logged out") {
+                window.location.href = "index.html";
+              } else if (data.message === "Failed log out") {
+                alert(
+                  "Something went wrong during logging out, please try again"
+                );
+              }
+            })
+            .catch((error) => {
+              console.error(
+                "Something went wrong during fetch to sign out: ",
+                error
+              );
+            });
+        });
+
+        // View user's followers operation
+        const followerButton = document.getElementById("follower-button");
+        followerButton.addEventListener("click", async (e) => {
           e.preventDefault();
           const username = localStorage.getItem("username");
-          fetch(`http://localhost:3000/api/social/followers/${username}`, {
+          fetch(`http://localhost:3000/api/social/followers/${userData._id}`, {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
@@ -88,85 +186,121 @@
             .catch((err) => console.error(err));
         });
 
-        const viewMsg = document.getElementById("viewMsg");
-        if (viewMsg) {
-          viewMsg.addEventListener("click", async (e) => {
-            e.preventDefault();
-            const userId = localStorage.getItem("username");
-            fetch(`http://localhost:3000/api/social/messages/${username}`, {
-              method: "GET",
-              headers: {
-                "Content-Type": "application/json",
-              },
+        // Follow user operation
+        followButton.addEventListener("click", async (e) => {
+          e.preventDefault();
+          fetch(`http://localhost:3000/api/social/followers/${userData._id}`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
+            .then((res) => res.json())
+            .then((followers) => {
+              localStorage.setItem("followers", JSON.stringify(followers));
+              window.location.href = "profile.html";
             })
-              .then((res) => res.json())
-              .then((messages) => {
-                localStorage.setItem("messages", JSON.stringify(messages));
-                window.location.href = "one_user_msgs.html";
-              })
-              .catch((err) => console.error(err));
-          });
-        }
-        // retrieve the button status from localStorage
-        let buttonStatus = localStorage.getItem("followButtonStatus");
+            .catch((err) => console.error(err));
+        });
 
-        // if the status is not set in localStorage, set it to "follow" by default
-        if (!buttonStatus) {
-          buttonStatus = "follow";
-        }
+        // Unfollow user operation
+        unfollowButton.addEventListener("click", async (e) => {
+          e.preventDefault();
+          fetch(`http://localhost:3000/api/social/followers/${userData._id}`, {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
+            .then((res) => res.json())
+            .then((followers) => {
+              localStorage.setItem("followers", JSON.stringify(followers));
+              window.location.href = "profile.html";
+            })
+            .catch((err) => console.error(err));
+        });
 
-        // get the follow button element
-        const followBtn = document.getElementById("followBtn");
-
-        // update the button text and color based on the retrieved status
-        if (buttonStatus === "follow") {
-          followBtn.innerText = "Follow";
-          followBtn.style.backgroundColor = "#0c756d";
-        } else {
-          followBtn.innerText = "Unfollow";
-          followBtn.style.backgroundColor = "gray";
-        }
-
-        // add a click event listener to the button
-        followBtn.addEventListener("click", async function () {
-          // toggle the button status
-          if (buttonStatus === "follow") {
-            buttonStatus = "unfollow";
-            followBtn.innerText = "Unfollow";
-            followBtn.style.backgroundColor = "gray";
-            // make a fetch request to the delete API
-            const response = await fetch(
-              "http://localhost:3000/api/social/followers/:id",
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                credentials: "include",
-              }
-            );
-          } else {
-            buttonStatus = "follow";
-            followBtn.innerText = "Follow";
-            followBtn.style.backgroundColor = "#0c756d";
-
-            // make a fetch request to the post API
-            const response = await fetch(
-              "http://localhost:3000/api/social/followers/:id",
-              {
-                method: "DELETE",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                credentials: "include",
-              }
-            );
-          }
-
-          // store the updated button status in localStorage
-          localStorage.setItem("followButtonStatus", buttonStatus);
+        // View user's messages operation
+        const viewMsgButton = document.getElementById("view-msgs-button");
+        viewMsgButton.addEventListener("click", async (e) => {
+          e.preventDefault();
+          const username = localStorage.getItem("username");
+          fetch(`http://localhost:3000/api/social/messages/${userData._id}`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
+            .then((res) => res.json())
+            .then((messages) => {
+              localStorage.setItem("messages", JSON.stringify(messages));
+              window.location.href = "one_user_msgs.html";
+            })
+            .catch((err) => console.error(err));
         });
       };
+
+      /* 
+         // retrieve the button status from localStorage
+         let buttonStatus = localStorage.getItem("followButtonStatus");
+
+         // if the status is not set in localStorage, set it to "follow" by default
+         if (!buttonStatus) {
+           buttonStatus = "follow";
+         }
+
+         // get the follow button element
+         const followBtn = document.getElementById("followBtn");
+
+         // update the button text and color based on the retrieved status
+         if (buttonStatus === "follow") {
+           followBtn.innerText = "Follow";
+           followBtn.style.backgroundColor = "#0c756d";
+         } else {
+           followBtn.innerText = "Unfollow";
+           followBtn.style.backgroundColor = "gray";
+         }
+
+         // add a click event listener to the button
+         followBtn.addEventListener("click", async function () {
+           // toggle the button status
+           if (buttonStatus === "follow") {
+             buttonStatus = "unfollow";
+             followBtn.innerText = "Unfollow";
+             followBtn.style.backgroundColor = "gray";
+             // make a fetch request to the delete API
+             const response = await fetch(
+               "http://localhost:3000/api/social/followers/:id",
+               {
+                 method: "POST",
+                 headers: {
+                   "Content-Type": "application/json",
+                 },
+                 credentials: "include",
+               }
+             );
+           } else {
+             buttonStatus = "follow";
+             followBtn.innerText = "Follow";
+             followBtn.style.backgroundColor = "#0c756d";
+
+             // make a fetch request to the post API
+             const response = await fetch(
+               "http://localhost:3000/api/social/followers/:id",
+               {
+                 method: "DELETE",
+                 headers: {
+                   "Content-Type": "application/json",
+                 },
+                 credentials: "include",
+               }
+             );
+           }
+
+           // store the updated button status in localStorage
+           localStorage.setItem("followButtonStatus", buttonStatus);
+         });
+       */
     </script>
 
     <footer class="footer">

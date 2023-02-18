@@ -19,47 +19,49 @@
         <button class="search-button" type="submit">🔍</button>
       </form>
     </div>
-    <button class="home-buttons" id="sign-out-button"><b>⏏️ Sign Out</b></button>
+    <button class="home-buttons" id="sign-out-button">⏏️ Sign Out</button>
   </header>
 
   <main>
-    <div id="app">
-      <div class="intro">
-        <button
-          class="home-buttons"
-          onclick="window.history.back()"
-          style="color: white; position: absolute; top: 100px; left: 45px"
-        >
-          ⬅️ Go Back
-        </button>
+    <div class="intro">
+      <button
+        class="home-buttons"
+        onclick="window.history.back()"
+        style="color: white; position: absolute; top: 100px; left: 45px"
+      >
+        ⬅️ Go Back
+      </button>
+      <div id="app">
         <h3>{{username}}'s messages</h3>
         <div class="scrollable-container">
-          <template v-for="message in messages" :key="message._id">
+          <template
+            v-if="messages !== null"
+            v-for="message in messages"
+            :key="message._id"
+          >
             <div>
-              <ul>
-                <li class="post">
-                  <div class="post-header">
-                    <div class="post-author">{{ message.author }}</div>
-                    <div class="post-date">{{ formatDate(message.date) }}</div>
-                  </div>
-                  <div class="post-content">{{ message.text }}</div>
-                  <div class="likes">
-                    <span id="like-count">{{ likes[message._id] }}</span>
-                    likes
-                    <button id="likeButton">👍</button>
-                    <button
-                      id="oneMsgButton"
-                      dataId="${message._id}"
-                      dataUser="${message.user}"
-                      style="color: white"
-                    >
-                      <b>Read message</b>
-                    </button>
-                  </div>
-                </li>
-              </ul>
+              <div class="post">
+                <div class="post-header">
+                  <div class="post-author">{{ message.author }}</div>
+                  <div class="post-date">{{ formatDate(message.date) }}</div>
+                </div>
+                <div class="post-content">{{ message.text }}</div>
+                <div class="likes">
+                  <button
+                    class="read-button"
+                    id="oneMsgButton"
+                    v-on:click="readMessage(message.authorId, message._id)"
+                    style="color: white"
+                  >
+                    <b>Read message</b>
+                  </button>
+                </div>
+              </div>
             </div>
           </template>
+          <div v-else>
+            <p>Loading messages...</p>
+          </div>
         </div>
       </div>
     </div>
@@ -68,58 +70,53 @@
   <script>
     window.onload = function () {
       const username = localStorage.getItem("username");
-      const messageUserId = new Vue({
+      const userDataObject = JSON.parse(localStorage.getItem("userData"));
+      const userData = userDataObject[0];
+      const messages = JSON.parse(localStorage.getItem(`messages`));
+      const app = new Vue({
         el: "#app",
         data: {
-          messages: [],
-          likes: [],
+          messages: null,
+          username: username,
+          userData: userData,
+          isAuthenticated: false,
         },
-        created() {
-          fetch(`http://localhost:3000/api/social/messages/${username}`, {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          })
+        mounted() {
+          fetch(`http://localhost:3000/api/social/messages/${userData._id}`)
             .then((res) => {
-              console.log(res);
               return res.json();
             })
-            .then((data) => {
-              console.log("Data from API:", data);
-              this.messages = data;
-              console.log(this.message);
-              this.messages.forEach((message) => {
-                this.likes[message._id] = 0;
-                fetch(`http://localhost:3000/api/social/like/${message._id}`, {
-                  method: "GET",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                })
-                  .then((res) => res.json())
-                  .then((data) => {
-                    console.log("Data from like API:", data);
-                    this.likes[message._id] = data.likes;
-                  })
-                  .catch((error) => {
-                    console.error(error);
-                  });
-              });
-            })
-            .catch((error) => {
-              console.error(error);
-            });
+            .then((messages) => (this.messages = messages))
+            .catch((error) => console.error(error));
         },
         methods: {
           formatDate(date) {
             const dateObject = new Date(date);
             return dateObject.toLocaleString();
           },
+          readMessage(userId, idMsg) {
+            fetch(
+              `http://localhost:3000/api/social/messages/${userId}/${idMsg}`
+            )
+              .then((res) => {
+                console.log(res);
+                return res.json();
+              })
+              .then((message) => {
+                localStorage.setItem(
+                  `message-${message._id}`,
+                  JSON.stringify(message)
+                );
+                window.location.href = `one_msg.html?id=${message._id}`;
+              })
+              .catch((err) => {
+                console.error(err);
+              });
+          },
         },
       });
 
-      const likeButton = document.getElementById("likeButton");
+      /*     const likeButton = document.getElementById("likeButton");
       if (likeButton) {
         const btnState = localStorage.getItem("likeBtnState");
         likeButton.innerHTML = btnState || "Like";
@@ -160,7 +157,7 @@
         })
         .catch((error) => {
           console.error("Error during the authentication verify: ", error);
-        });
+        });*/
     };
   </script>
 </html>
