@@ -12,27 +12,14 @@
   <body>
     <header class="header">
       <a href="index.html" class="logo">💬 Messagly</a>
-      <div class="search-container">
-        <form
-          id="search-form"
-          class="search-form"
-          v-on:submit.prevent="search"
-          action="search_results.html"
-          method="get"
-        >
-          <input
-            type="text"
-            id="search-input"
-            v-model="searchQuery"
-            name="search"
-            placeholder="Search users"
-            required
-          />
-          <button id="search-button" class="search-button" type="submit">
-            🔍
-          </button>
-        </form>
-      </div>
+      <button
+        class="home-buttons"
+        id="search-again-button"
+        onclick="goToHomepage()"
+      >
+        <b>🔍 Search</b>
+      </button>
+      <!-- Only show the "Sign Out" button if the user is authenticated. -->
       <button class="home-buttons" id="sign-out-button">⏏️ Sign Out</button>
     </header>
     <div class="intro">
@@ -67,7 +54,7 @@
         </div>
       </div>
       <div class="buttons">
-        <button class="home-buttons" onclick="toYourMsgs()">
+        <button class="home-buttons" id="view-msgs-button">
           💬 Your messages
         </button>
         <button class="home-buttons" onclick="toFeed()">👁️‍🗨️ Your feed</button>
@@ -111,10 +98,35 @@
               .then((response) => response.json())
               .then((data) => {
                 this.userData = data;
-                localStorage.setItem("userData", JSON.stringify(userData));
+                localStorage.setItem("userData", JSON.stringify(this.userData));
               })
               .catch((error) => console.error(error));
           },
+        });
+
+        // View user's messages operation
+        const viewMsgButton = document.getElementById("view-msgs-button");
+        viewMsgButton.addEventListener("click", async (e) => {
+          e.preventDefault();
+          const username = localStorage.getItem("username");
+          if (!username) {
+            username = userData.username;
+          }
+          fetch(
+            `http://localhost:3000/api/social/messages/${app.userData._id}`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          )
+            .then((res) => res.json())
+            .then((messages) => {
+              localStorage.setItem("messages", JSON.stringify(messages));
+              window.location.href = "one_user_msgs.html";
+            })
+            .catch((err) => console.error(err));
         });
 
         // View user's followers operation
@@ -122,12 +134,15 @@
         followerButton.addEventListener("click", async (e) => {
           e.preventDefault();
           const username = localStorage.getItem("username");
-          fetch(`http://localhost:3000/api/social/followers/${userData._id}`, {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          })
+          fetch(
+            `http://localhost:3000/api/social/followers/${app.userData._id}`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          )
             .then((res) => res.json())
             .then((followers) => {
               localStorage.setItem("followers", JSON.stringify(followers));
@@ -165,39 +180,18 @@
             localStorage.removeItem("username");
           }
         });
-
-        // Search operation
-        const searchButton = document.getElementById("search-button");
-        searchForm.addEventListener("submit", async (e) => {
-          e.preventDefault();
-          const query = searchInput.value;
-          fetch(`http://localhost:3000/api/social/search?q=${query}`)
-            .then((response) => response.json())
-            .then((searchedUsers) => {
-              localStorage.setItem(
-                "searchedUsers",
-                JSON.stringify(searchedUsers)
-              );
-              window.location.href = "search_results.html";
-            })
-            .catch((error) => {
-              console.error(
-                "Something went wrong during fetch to search: ",
-                error
-              );
-            });
-        });
       };
 
-      function toYourMsgs() {
-        window.location.href = "one_user_msgs.html";
-      }
       function toFeed() {
         window.location.href = "feed.html";
       }
 
       function toMsgWriting() {
         window.location.href = "create_msg.html";
+      }
+
+      function goToHomepage() {
+        window.location.href = "index.html";
       }
     </script>
   </body>

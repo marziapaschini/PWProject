@@ -12,27 +12,14 @@
   <body>
     <header class="header">
       <a href="index.html" class="logo">💬 Messagly</a>
-      <div class="search-container">
-        <form
-          id="search-form"
-          class="search-form"
-          v-on:submit.prevent="search"
-          action="search_results.html"
-          method="get"
-        >
-          <input
-            type="text"
-            id="search-input"
-            v-model="searchQuery"
-            name="search"
-            placeholder="Search users"
-            required
-          />
-          <button id="search-button" class="search-button" type="submit">
-            🔍
-          </button>
-        </form>
-      </div>
+      <button
+        class="home-buttons"
+        id="search-again-button"
+        onclick="goToHomepage()"
+      >
+        <b>🔍 Search</b>
+      </button>
+      <!-- Only show the "Sign Out" button if the user is authenticated. -->
       <button class="home-buttons" id="sign-out-button" v-if="isAuthenticated">
         ⏏️ Sign Out
       </button>
@@ -198,6 +185,9 @@
             });
         });
       };
+      function goToHomepage() {
+        window.location.href = "index.html";
+      }
     </script>
   </body>
 </html>

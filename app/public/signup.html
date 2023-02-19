@@ -54,6 +54,20 @@
 
     <script>
       window.onload = function () {
+        // Fetch the API to check if the user is already authenticated
+        fetch("http://localhost:3000/api/auth/verify")
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.isAuthenticated) {
+              // Already authenticated users cannot be here
+              alert("You are already authenticated, you cannot be here");
+              window.location.href = "index.html";
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+
         const form = document.getElementById("signUpForm");
         if (form) {
           form.addEventListener("submit", async (e) => {
@@ -63,10 +77,7 @@
             const username = document.getElementById("username").value;
             const password = document.getElementById("password").value;
             const bio = document.getElementById("bio").value;
-            const updatedUsername = localStorage.setItem(
-              "updatedUsername",
-              username
-            );
+            localStorage.setItem("username", username);
             const res = await fetch("http://localhost:3000/api/auth/signup", {
               method: "POST",
               headers: {

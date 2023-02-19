@@ -6,33 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>💬 Search results</title>
     <link rel="stylesheet" href="new_style.css" />
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11/dist/vue.js"></script>
   </head>
 
   <body>
     <header class="header">
       <a href="index.html" class="logo">💬 Messagly</a>
-      <div class="search-container">
-        <form
-          id="search-form"
-          class="search-form"
-          v-on:submit.prevent="search"
-          action="search_results.html"
-          method="get"
-        >
-          <input
-            type="text"
-            id="search-input"
-            v-model="searchQuery"
-            name="search"
-            placeholder="Search users"
-            required
-          />
-          <button id="search-button" class="search-button" type="submit">
-            🔍
-          </button>
-        </form>
-      </div>
+      <button
+        class="home-buttons"
+        id="search-again-button"
+        onclick="goToHomepage()"
+      >
+        <b>🔍 Search Again</b>
+      </button>
       <!-- Only show the "Sign Out" button if the user is authenticated. -->
       <button class="home-buttons" id="sign-out-button" v-if="isAuthenticated">
         <b>⏏️ Sign Out</b>
@@ -46,8 +32,12 @@
           >Click on the profile of the user you want to see</p2
         >
         <div :class="{'scrollable-container': true, 'hide-scrollbar': isEmpty}">
-          <template v-for="user in users">
-            <div class="profile">
+          <template v-for="user in users" data-username="{{user.username}}">
+            <div
+              class="profile"
+              data-username="{{user.username}}"
+              v-if="user.username !== currentUser"
+            >
               <a href="profile.html" class="profile-link"
                 >{{ user.username }}</a
               >
@@ -69,6 +59,7 @@
           el: "#app",
           data: {
             users: users,
+            currentUser: localStorage.getItem("currentUser"),
             isAuthenticated: false,
           },
           watch: {
@@ -113,20 +104,25 @@
           });
         });
 
-        // Search operation
+        /* // Search operation
         const searchButton = document.getElementById("search-button");
         searchForm.addEventListener("submit", async (e) => {
           e.preventDefault();
-          if (searchedUsers) {
-            localStorage.removeItem("searchedUsers");
-          }
           const query = searchInput.value;
-          fetch(`http://localhost:3000/api/social/search?q=${query}`)
+          const searchedUsers = JSON.parse(
+            localStorage.getItem("searchedUsers")
+          );
+          const url = searchedUsers
+            ? `http://localhost:3000/api/social/search?q=${query}&searched=${JSON.stringify(
+                searchedUsers
+              )}`
+            : `http://localhost:3000/api/social/search?q=${query}`;
+          fetch(url)
             .then((response) => response.json())
-            .then((searchedUsers) => {
+            .then((newSearchedUsers) => {
               localStorage.setItem(
                 "searchedUsers",
-                JSON.stringify(searchedUsers)
+                JSON.stringify(newSearchedUsers)
               );
               window.location.href = "search_results.html";
             })
@@ -136,7 +132,7 @@
                 error
               );
             });
-        });
+        }); */
 
         const signOutButton = document.getElementById("sign-out-button");
         // Fetch the API to check if the user is authenticated
@@ -146,6 +142,7 @@
             if (data.isAuthenticated) {
               // If the user is authenticated, show the logout button
               signOutButton.style.display = "block";
+              localStorage.setItem("currentUser", data.currentUsername);
             } else {
               // If the user is not authenticated, hide the logut button
               signOutButton.style.display = "none";
@@ -188,52 +185,9 @@
           }
         });
       };
-
-      // Set the page
-      /*   
-              // show the sign out button only if the user is authenticated
-              
-              // Fetch the API to check if the user is authenticated
-              fetch("http://localhost:3000/api/auth/verify")
-                .then((response) => response.json())
-                .then((data) => {
-                  if (data.isAuthenticated) {
-                    // If the user is authenticated, show the sign out button
-                    signOutButton.style.display = "block";
-                  } else {
-                    // If the user is not authenticated, hide the sign out button
-                    signOutButton.style.display = "none";
-                  }
-                })
-                .catch((error) => {
-                  console.error(error);
-                });
-
-              // Sign out operation
-              signOutButton.addEventListener("click", async (e) => {
-                const res = await fetch("http://localhost:3000/api/auth/signout", {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                })
-                  .then((res) => {
-                    return res.json();
-                  })
-                  .then((data) => {
-                    if (data.message === "Successfully logged out") {
-                      window.location.href = "index.html";
-                    } else if (data.message === "Failed log out") {
-                      alert(
-                        "Something went wrong during logging out, please try again"
-                      );
-                    }
-                  })
-                  .catch((error) => {
-                    console.error("Something went wrong during fetch: ", error);
-                  });
-              });
-            };*/
+      function goToHomepage() {
+        window.location.href = "index.html";
+      }
     </script>
   </body>
 </html>

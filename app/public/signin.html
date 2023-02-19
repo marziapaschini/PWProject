@@ -68,6 +68,20 @@
 
     <script>
       window.onload = function () {
+        // Fetch the API to check if the user is already authenticated
+        fetch("http://localhost:3000/api/auth/verify")
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.isAuthenticated) {
+              // Already authenticated users cannot be here
+              alert("You are already authenticated, you cannot be here");
+              window.location.href = "index.html";
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+
         const form = document.getElementById("signInForm");
         form.addEventListener("submit", async (e) => {
           e.preventDefault();

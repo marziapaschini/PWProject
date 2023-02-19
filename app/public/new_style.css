@@ -29,6 +29,8 @@ body {
 .search-container {
   top: 20px;
   right: 20px;
+  display: flex;
+  align-items: center;
 }
 
 .search-form {
@@ -374,7 +376,7 @@ a {
 }
 
 .scrollable-container {
-  height: 500px;
+  height: 400px;
   overflow-y: auto;
 }
 

@@ -12,17 +12,13 @@
   <body>
     <header class="header">
       <a href="index.html" class="logo">💬 Messagly</a>
-      <div class="search-container">
-        <form class="search-form" action="#" method="get">
-          <input
-            type="text"
-            id="search"
-            name="search"
-            placeholder="Search users"
-          />
-          <button class="search-button" type="submit">🔍</button>
-        </form>
-      </div>
+      <button
+        class="home-buttons"
+        id="search-again-button"
+        onclick="goToHomepage()"
+      >
+        <b>🔍 Search</b>
+      </button>
       <!-- Only show the "Sign Out" button if the user is authenticated. -->
       <button id="sign-out-button" class="home-buttons">⏏️ Sign Out</button>
     </header>
@@ -65,14 +61,12 @@
             </button>
             <!-- Only show the "Follow"/"Unfollow" button if the user is authenticated. -->
             <button
-              v-if="isAuthenticated"
               class="home-buttons"
               id="follow-button"
               style="margin: 0 auto"
             >
               ➕ Follow</button
             ><button
-              v-if="isAuthenticated"
               class="home-buttons"
               id="unfollow-button"
               style="margin: 0 auto"
@@ -87,11 +81,18 @@
       </body>
     </div>
 
+    <footer class="footer">
+      <div class="copy">© 2023 Developer</div>
+    </footer>
+
     <script>
       window.onload = function () {
         const userDataObject = JSON.parse(localStorage.getItem("userData"));
         const userData = userDataObject[0];
         const username = localStorage.getItem("username");
+        if (!username) {
+          username = userData.username;
+        }
         const app = new Vue({
           el: "#app",
           data: {
@@ -100,28 +101,11 @@
           },
         });
 
-        // Check if the authenticated user is following the user
-        fetch(`http://localhost:3000/api/social/checkFollowing/${userData._id}`)
-          .then((response) => response.json())
-          .then((data) => {
-            // If the user is already following the profile, show the unfollow button
-            if (data.following) {
-              followButton.style.display = "none";
-              unfollowButton.style.display = "block";
-            }
-            // If the user is not following the profile, show the follow button
-            else {
-              followButton.style.display = "block";
-              unfollowButton.style.display = "none";
-            }
-          })
-          .catch((error) => {
-            console.error(error);
-          });
-
         const signOutButton = document.getElementById("sign-out-button");
         const followButton = document.getElementById("follow-button");
         const unfollowButton = document.getElementById("unfollow-button");
+        const searchButton = document.getElementById("search-again-button");
+
         // Fetch the API to check if the user is authenticated
         fetch("http://localhost:3000/api/auth/verify")
           .then((response) => response.json())
@@ -129,9 +113,33 @@
             if (data.isAuthenticated) {
               // If the user is authenticated, show the logout button
               signOutButton.style.display = "block";
+              searchButton.style.display = "block";
+              // Check if the authenticated user is following the user
+              fetch(
+                `http://localhost:3000/api/social/checkFollowing/${userData._id}`
+              )
+                .then((response) => response.json())
+                .then((data) => {
+                  // If the user is already following the profile, show the unfollow button
+                  if (data.following) {
+                    followButton.style.display = "none";
+                    unfollowButton.style.display = "inline-block";
+                  }
+                  // If the user is not following the profile, show the follow button
+                  else {
+                    followButton.style.display = "inline-block";
+                    unfollowButton.style.display = "none";
+                  }
+                })
+                .catch((error) => {
+                  console.error(error);
+                });
             } else {
               // If the user is not authenticated, hide the logout button
               signOutButton.style.display = "none";
+              followButton.style.display = "none";
+              unfollowButton.style.display = "none";
+              searchButton.style.display = "block";
             }
           })
           .catch((error) => {
@@ -172,7 +180,6 @@
         viewMsgButton.addEventListener("click", async (e) => {
           e.preventDefault();
           const username = localStorage.getItem("username");
-          console.log("Fetching messages for user: ", userData._id);
           fetch(`http://localhost:3000/api/social/messages/${userData._id}`, {
             method: "GET",
             headers: {
@@ -181,7 +188,6 @@
           })
             .then((res) => res.json())
             .then((messages) => {
-              console.log("Received messages: ", messages);
               localStorage.setItem("messages", JSON.stringify(messages));
               window.location.href = "one_user_msgs.html";
             })
@@ -241,10 +247,9 @@
             .catch((err) => console.error(err));
         });
       };
+      function goToHomepage() {
+        window.location.href = "index.html";
+      }
     </script>
-
-    <footer class="footer">
-      <div class="copy">© 2023 Developer</div>
-    </footer>
   </body>
 </html>

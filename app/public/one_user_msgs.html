@@ -8,27 +8,14 @@
 
   <header class="header">
     <a href="index.html" class="logo">💬 Messagly</a>
-    <div class="search-container">
-      <form
-        id="search-form"
-        class="search-form"
-        v-on:submit.prevent="search"
-        action="search_results.html"
-        method="get"
-      >
-        <input
-          type="text"
-          id="search-input"
-          v-model="searchQuery"
-          name="search"
-          placeholder="Search users"
-          required
-        />
-        <button id="search-button" class="search-button" type="submit">
-          🔍
-        </button>
-      </form>
-    </div>
+    <button
+      class="home-buttons"
+      id="search-again-button"
+      onclick="goToHomepage()"
+    >
+      <b>🔍 Search</b>
+    </button>
+    <!-- Only show the "Sign Out" button if the user is authenticated. -->
     <button class="home-buttons" id="sign-out-button">⏏️ Sign Out</button>
   </header>
 
@@ -45,7 +32,7 @@
         <h3>{{username}}'s messages</h3>
         <div class="scrollable-container">
           <template
-            v-if="messages !== null"
+            v-show="!isEmpty"
             v-for="message in messages"
             :key="message._id"
           >
@@ -69,20 +56,30 @@
               </div>
             </div>
           </template>
-          <div v-else>
-            <p>Loading messages...</p>
+          <div v-if="isEmpty">
+            <p2 style="margin-top: 0.0001em; font-size: 25px"
+              >No messages found.</p2
+            >
           </div>
         </div>
       </div>
     </div>
   </main>
 
+  <footer class="footer">
+    <div class="copy">© 2023 Developer</div>
+  </footer>
+
   <script>
     window.onload = function () {
       const username = localStorage.getItem("username");
       const userDataObject = JSON.parse(localStorage.getItem("userData"));
       const userData = userDataObject[0];
+      if (!username) {
+        username = userData.username;
+      }
       const messages = JSON.parse(localStorage.getItem(`messages`));
+
       const app = new Vue({
         el: "#app",
         data: {
@@ -124,23 +121,15 @@
               });
           },
         },
+        computed: {
+          isEmpty() {
+            return this.messages.length === 0;
+          },
+        },
       });
-
-      /* 
-      fetch("http://localhost:3000/api/auth/verify")
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.message === "Not authenticated") {
-            console.log("User is not logged in");
-            likeButton.style.display = "none";
-          } else {
-            console.log(`User is logged in as ${data.username}`);
-            likeButton.style.display = "block";
-          }
-        })
-        .catch((error) => {
-          console.error("Error during the authentication verify: ", error);
-        });*/
     };
+    function goToHomepage() {
+      window.location.href = "index.html";
+    }
   </script>
 </html>

@@ -67,22 +67,6 @@ router.post("/signin", async (req, res) => {
   }
 });
 
-/*
-router.get("/verify", async (req, res) => {
-  try {
-    const token = req.cookies.jwt;
-    if (!token) {
-      res.status(401).json({ message: "Not authenticated" });
-    } else {
-      const decoded = jwt.verify(token, "secret_key");
-      res.json({ message: "Authenticated", username: decoded.id });
-    }
-  } catch (err) {
-    res.status(401).json({ message: "Not authenticated" });
-  }
-});
-*/
-
 /* Additional API to verify if a user is authenticated */
 router.get("/verify", async (req, res) => {
   try {
@@ -91,7 +75,7 @@ router.get("/verify", async (req, res) => {
       res.status(401).json({ isAuthenticated: false });
     } else {
       const decoded = jwt.verify(token, "secret_key");
-      res.json({ isAuthenticated: true, username: decoded.id });
+      res.json({ isAuthenticated: true, currentUsername: decoded.id });
     }
   } catch (err) {
     res.status(401).json({ isAuthenticated: false });

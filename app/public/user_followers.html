@@ -12,17 +12,13 @@
   <body>
     <header class="header">
       <a href="index.html" class="logo">💬 Messagly</a>
-      <div class="search-container">
-        <form class="search-form" action="#" method="get">
-          <input
-            type="text"
-            id="search"
-            name="search"
-            placeholder="Search users"
-          />
-          <button class="search-button" type="submit">🔍</button>
-        </form>
-      </div>
+      <button
+        class="home-buttons"
+        id="search-again-button"
+        onclick="goToHomepage()"
+      >
+        <b>🔍 Search</b>
+      </button>
       <!-- Only show the "Sign Out" button if the user is authenticated. -->
       <button class="home-buttons" id="sign-out-button">⏏️ Sign Out</button>
     </header>
@@ -36,9 +32,14 @@
         >
           ⬅️ Go Back
         </button>
-        <h3>Followers</h3>
-        <div :class="{'scrollable-container': true, 'hide-scrollbar': isEmpty}">
-          <div id="app">
+        <h3 style="margin-bottom: 0.25em">Followers</h3>
+        <div id="app">
+          <p2 v-show="!isEmpty" style="margin-top: 0.0001em; font-size: 25px"
+            >Click on the profile of the user you want to see</p2
+          >
+          <div
+            :class="{'scrollable-container': shouldShowScrollbar, 'hide-scrollbar': isEmpty}"
+          >
             <template v-for="follower in followers">
               <div class="profile">
                 <a
@@ -74,11 +75,29 @@
           methods: {
             storeUsername(username) {
               localStorage.setItem("username", username);
+              const userData = localStorage.getItem("userData");
+              /* if (userData) {
+                localStorage.removeItem(userData);
+              } */
+              fetch(`http://localhost:3000/api/social/users?q=${username}`)
+                .then((res) => {
+                  return res.json();
+                })
+                .then((newUserData) => {
+                  localStorage.setItem("userData", JSON.stringify(newUserData));
+                  window.location.href = "profile.html";
+                })
+                .catch((error) => {
+                  console.error(error);
+                });
             },
           },
           computed: {
             isEmpty() {
               return this.followers.length === 0;
+            },
+            shouldShowScrollbar() {
+              return this.followers.length > 4;
             },
           },
         });
@@ -108,7 +127,14 @@
               console.error("Something went wrong during fetch: ", error);
             });
         });
+        const username = localStorage.getItem("username");
+        if (username) {
+          localStorage.removeItem("username");
+        }
       };
+      function goToHomepage() {
+        window.location.href = "index.html";
+      }
     </script>
   </body>
 </html>

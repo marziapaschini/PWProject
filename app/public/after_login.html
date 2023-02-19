@@ -131,7 +131,7 @@
               .then((response) => response.json())
               .then((data) => {
                 this.userData = data;
-                //localStorage.setItem("userData", JSON.stringify(userData));
+                localStorage.setItem("userData", JSON.stringify(userData));
               })
               .catch((error) => console.error(error));
           },
