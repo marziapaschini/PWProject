@@ -3,13 +3,6 @@ const router = express.Router();
 const db = require("./db.js");
 const jwt = require("jsonwebtoken");
 
-/* Simple get-all-messages API
-router.get("/messages/", async (req, res) => {
-  const mongo = db.getDb();
-  let allMessages = await mongo.collection("messages").find({}).toArray();
-  res.json(allMessages);
-});*/
-
 /* API to get all messages and the relative user ID for each message
    in order to make vue.js work in the single message visualization  */
 router.get("/messages", async (req, res) => {
@@ -38,22 +31,6 @@ router.get("/messages", async (req, res) => {
     .toArray();
   res.json(allMessages);
 });
-
-/* router.get("/messages/:userId", async (req, res) => {
-  const mongo = db.getDb();
-  const id = !isNaN(parseInt(req.params.userId))
-    ? parseInt(req.params.userId)
-    : null;
-  if (!id) {
-    return res.status(404).send({ error: "Invalid user ID" });
-  }
-  const user = await mongo.collection("users").findOne({ _id: id });
-  const userMessages = await mongo
-    .collection("messages")
-    .find({ author: user.username })
-    .toArray();
-  res.json(userMessages);
-}); */
 
 router.get("/messages/:userId", async (req, res) => {
   const mongo = db.getDb();

@@ -104,36 +104,6 @@
           });
         });
 
-        /* // Search operation
-        const searchButton = document.getElementById("search-button");
-        searchForm.addEventListener("submit", async (e) => {
-          e.preventDefault();
-          const query = searchInput.value;
-          const searchedUsers = JSON.parse(
-            localStorage.getItem("searchedUsers")
-          );
-          const url = searchedUsers
-            ? `http://localhost:3000/api/social/search?q=${query}&searched=${JSON.stringify(
-                searchedUsers
-              )}`
-            : `http://localhost:3000/api/social/search?q=${query}`;
-          fetch(url)
-            .then((response) => response.json())
-            .then((newSearchedUsers) => {
-              localStorage.setItem(
-                "searchedUsers",
-                JSON.stringify(newSearchedUsers)
-              );
-              window.location.href = "search_results.html";
-            })
-            .catch((error) => {
-              console.error(
-                "Something went wrong during fetch to search: ",
-                error
-              );
-            });
-        }); */
-
         const signOutButton = document.getElementById("sign-out-button");
         // Fetch the API to check if the user is authenticated
         fetch("http://localhost:3000/api/auth/verify")

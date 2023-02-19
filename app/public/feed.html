@@ -164,6 +164,7 @@
           },
         });
 
+        // Sign out operation
         const signOutButton = document.getElementById("sign-out-button");
         signOutButton.addEventListener("click", async (e) => {
           const res = await fetch("http://localhost:3000/api/auth/signout", {
@@ -189,6 +190,7 @@
             });
         });
       };
+
       function goBack() {
         if (document.referrer.endsWith("after_login.html")) {
           window.location.href = "after_login.html";
@@ -198,6 +200,7 @@
           window.history.back();
         }
       }
+
       function goToHomepage() {
         window.location.href = "index.html";
       }
