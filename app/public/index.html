@@ -12,28 +12,25 @@
   <body>
     <header class="header">
       <a href="#" class="logo">💬 Messagly</a>
-      <div id="app">
-        <div class="search-container">
-          <form
-            id="search-form"
-            class="search-form"
-            v-on:submit.prevent="search"
-            action="search_results.html"
-            method="get"
-          >
-            <input
-              type="text"
-              id="search-input"
-              v-model="searchQuery"
-              name="search"
-              placeholder="Search users"
-              required
-            />
-            <button id="search-button" class="search-button" type="submit">
-              🔍
-            </button>
-          </form>
-        </div>
+      <div class="search-container">
+        <form
+          id="search-form"
+          class="search-form"
+          action="search_results.html"
+          method="get"
+        >
+          <input
+            type="text"
+            id="search-input"
+            v-model="searchQuery"
+            name="search"
+            placeholder="Search users"
+            required
+          />
+          <button id="search-button" class="search-button" type="submit">
+            🔍
+          </button>
+        </form>
       </div>
       <!-- Only show the "Sign Out" button if the user is authenticated. -->
       <button id="sign-out-button" class="home-buttons">⏏️ Sign Out</button>
@@ -91,25 +88,6 @@
       const searchForm = document.getElementById("search-form");
       const searchButton = document.getElementById("search-button");
       const searchInput = document.getElementById("search-input");
-      /*
-      const app = Vue.createApp({
-        data() {
-          return {
-            searchQuery: "",
-          };
-        },
-        methods: {
-          search() {
-            if (this.searchQuery.length > 0) {
-              const searchForm = document.getElementById("search-form");
-              searchForm.action = "search_results.html?q=" + this.searchQuery;
-              searchForm.submit();
-            }
-          },
-        },
-      });
-
-      app.mount("#app");*/
 
       // Fetch the API to check if the user is authenticated
       fetch("http://localhost:3000/api/auth/verify")
@@ -160,9 +138,11 @@
               error
             );
           });
+        const username = localStorage.getItem("username");
+        if (username) {
+          localStorage.removeItem("username");
+        }
       });
-
-      
 
       // Search operation
       searchForm.addEventListener("submit", async (e) => {
@@ -171,8 +151,10 @@
         fetch(`http://localhost:3000/api/social/search?q=${query}`)
           .then((response) => response.json())
           .then((searchedUsers) => {
-            
-            localStorage.setItem("searchedUsers", JSON.stringify(searchedUsers));
+            localStorage.setItem(
+              "searchedUsers",
+              JSON.stringify(searchedUsers)
+            );
             window.location.href = "search_results.html";
           })
           .catch((error) => {

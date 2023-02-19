@@ -23,6 +23,7 @@
           <button class="search-button" type="submit">🔍</button>
         </form>
       </div>
+      <!-- Only show the "Sign Out" button if the user is authenticated. -->
       <button class="home-buttons" id="sign-out-button">⏏️ Sign Out</button>
     </header>
 
@@ -36,7 +37,7 @@
           ⬅️ Go Back
         </button>
         <h3>Followers</h3>
-        <div class="scrollable-container">
+        <div :class="{'scrollable-container': true, 'hide-scrollbar': isEmpty}">
           <div id="app">
             <template v-for="follower in followers">
               <div class="profile">
@@ -48,6 +49,11 @@
                 >
               </div>
             </template>
+            <div v-if="isEmpty">
+              <p2 style="margin-top: 0.0001em; font-size: 25px"
+                >No followers.</p2
+              >
+            </div>
           </div>
         </div>
       </div>
@@ -68,6 +74,11 @@
           methods: {
             storeUsername(username) {
               localStorage.setItem("username", username);
+            },
+          },
+          computed: {
+            isEmpty() {
+              return this.followers.length === 0;
             },
           },
         });

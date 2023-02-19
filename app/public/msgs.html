@@ -13,14 +13,24 @@
     <header class="header">
       <a href="index.html" class="logo">💬 Messagly</a>
       <div class="search-container">
-        <form class="search-form" action="#" method="get">
+        <form
+          id="search-form"
+          class="search-form"
+          v-on:submit.prevent="search"
+          action="search_results.html"
+          method="get"
+        >
           <input
             type="text"
-            id="search"
+            id="search-input"
+            v-model="searchQuery"
             name="search"
             placeholder="Search users"
+            required
           />
-          <button class="search-button" type="submit">🔍</button>
+          <button id="search-button" class="search-button" type="submit">
+            🔍
+          </button>
         </form>
       </div>
       <button class="home-buttons" id="sign-out-button" v-if="isAuthenticated">
@@ -37,7 +47,10 @@
         >
           ⬅️ Go Back
         </button>
-        <h3>All messages</h3>
+        <h3 style="margin-bottom: 0.25em">All messages</h3>
+        <p2 style="margin-top: 0.0001em; font-size: 25px"
+          >Read all messages of all users</p2
+        >
         <div id="app">
           <div class="scrollable-container">
             <template v-for="message in messages">

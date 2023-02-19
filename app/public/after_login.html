@@ -13,14 +13,24 @@
     <header class="header">
       <a href="index.html" class="logo">💬 Messagly</a>
       <div class="search-container">
-        <form class="search-form" action="#" method="get">
+        <form
+          id="search-form"
+          class="search-form"
+          v-on:submit.prevent="search"
+          action="search_results.html"
+          method="get"
+        >
           <input
             type="text"
-            id="search"
+            id="search-input"
+            v-model="searchQuery"
             name="search"
             placeholder="Search users"
+            required
           />
-          <button class="search-button" type="submit">🔍</button>
+          <button id="search-button" class="search-button" type="submit">
+            🔍
+          </button>
         </form>
       </div>
       <!--  <button class="info-button" id="info-button">ℹ️ Info</button>-->
@@ -121,6 +131,7 @@
               .then((response) => response.json())
               .then((data) => {
                 this.userData = data;
+                //localStorage.setItem("userData", JSON.stringify(userData));
               })
               .catch((error) => console.error(error));
           },

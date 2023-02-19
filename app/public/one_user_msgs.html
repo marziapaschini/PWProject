@@ -9,14 +9,24 @@
   <header class="header">
     <a href="index.html" class="logo">💬 Messagly</a>
     <div class="search-container">
-      <form class="search-form" action="#" method="get">
+      <form
+        id="search-form"
+        class="search-form"
+        v-on:submit.prevent="search"
+        action="search_results.html"
+        method="get"
+      >
         <input
           type="text"
-          id="search"
+          id="search-input"
+          v-model="searchQuery"
           name="search"
           placeholder="Search users"
+          required
         />
-        <button class="search-button" type="submit">🔍</button>
+        <button id="search-button" class="search-button" type="submit">
+          🔍
+        </button>
       </form>
     </div>
     <button class="home-buttons" id="sign-out-button">⏏️ Sign Out</button>
@@ -116,34 +126,7 @@
         },
       });
 
-      /*     const likeButton = document.getElementById("likeButton");
-      if (likeButton) {
-        const btnState = localStorage.getItem("likeBtnState");
-        likeButton.innerHTML = btnState || "Like";
-        likeButton.addEventListener("click", function () {
-          const message = localStorage.getItem("message");
-          const messageObject = JSON.parse(message);
-          const messageId = messageObject._id;
-          alert(messageId);
-
-          if (likeButton.innerHTML === "Like") {
-            localStorage.setItem("likeBtnState", "Unlike");
-            likeButton.innerHTML = "Unlike";
-            likeButton.style.backgroundColor = "gray";
-            fetch(`http://localhost:3000/api/social/like/${messageId}`, {
-              method: "POST",
-            });
-          } else {
-            likeButton.innerHTML = "Like";
-            likeButton.style.backgroundColor = "#363636";
-            localStorage.setItem("likeBtnState", "Like");
-            fetch(`http://localhost:3000/api/social/like/${messageId}`, {
-              method: "DELETE",
-            });
-          }
-        });
-      }
-
+      /* 
       fetch("http://localhost:3000/api/auth/verify")
         .then((res) => res.json())
         .then((data) => {

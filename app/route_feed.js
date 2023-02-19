@@ -15,14 +15,33 @@ router.get("/feed", async (req, res) => {
       .collection("followers")
       .find({ follows: user.username })
       .toArray();
-    let followedMessages = [];
-    for (flw of followed) {
-      let followedMessage = await mongo
-        .collection("messages")
-        .find({ author: flw.isFollowed })
-        .toArray();
-      followedMessages = followedMessages.concat(followedMessage);
-    }
+    const followedMessages = await mongo
+      .collection("messages")
+      .aggregate([
+        {
+          $match: {
+            author: { $in: followed.map((flw) => flw.isFollowed) },
+          },
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "author",
+            foreignField: "username",
+            as: "authorInfo",
+          },
+        },
+        {
+          $project: {
+            _id: 1,
+            date: 1,
+            text: 1,
+            author: 1,
+            authorId: "$authorInfo._id",
+          },
+        },
+      ])
+      .toArray();
     res.json(followedMessages);
   } catch (err) {
     console.log(err);

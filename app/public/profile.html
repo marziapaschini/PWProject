@@ -167,6 +167,27 @@
             });
         });
 
+        // View user's messages operation
+        const viewMsgButton = document.getElementById("view-msgs-button");
+        viewMsgButton.addEventListener("click", async (e) => {
+          e.preventDefault();
+          const username = localStorage.getItem("username");
+          console.log("Fetching messages for user: ", userData._id);
+          fetch(`http://localhost:3000/api/social/messages/${userData._id}`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
+            .then((res) => res.json())
+            .then((messages) => {
+              console.log("Received messages: ", messages);
+              localStorage.setItem("messages", JSON.stringify(messages));
+              window.location.href = "one_user_msgs.html";
+            })
+            .catch((err) => console.error(err));
+        });
+
         // View user's followers operation
         const followerButton = document.getElementById("follower-button");
         followerButton.addEventListener("click", async (e) => {
@@ -219,88 +240,7 @@
             })
             .catch((err) => console.error(err));
         });
-
-        // View user's messages operation
-        const viewMsgButton = document.getElementById("view-msgs-button");
-        viewMsgButton.addEventListener("click", async (e) => {
-          e.preventDefault();
-          const username = localStorage.getItem("username");
-          fetch(`http://localhost:3000/api/social/messages/${userData._id}`, {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          })
-            .then((res) => res.json())
-            .then((messages) => {
-              localStorage.setItem("messages", JSON.stringify(messages));
-              window.location.href = "one_user_msgs.html";
-            })
-            .catch((err) => console.error(err));
-        });
       };
-
-      /* 
-         // retrieve the button status from localStorage
-         let buttonStatus = localStorage.getItem("followButtonStatus");
-
-         // if the status is not set in localStorage, set it to "follow" by default
-         if (!buttonStatus) {
-           buttonStatus = "follow";
-         }
-
-         // get the follow button element
-         const followBtn = document.getElementById("followBtn");
-
-         // update the button text and color based on the retrieved status
-         if (buttonStatus === "follow") {
-           followBtn.innerText = "Follow";
-           followBtn.style.backgroundColor = "#0c756d";
-         } else {
-           followBtn.innerText = "Unfollow";
-           followBtn.style.backgroundColor = "gray";
-         }
-
-         // add a click event listener to the button
-         followBtn.addEventListener("click", async function () {
-           // toggle the button status
-           if (buttonStatus === "follow") {
-             buttonStatus = "unfollow";
-             followBtn.innerText = "Unfollow";
-             followBtn.style.backgroundColor = "gray";
-             // make a fetch request to the delete API
-             const response = await fetch(
-               "http://localhost:3000/api/social/followers/:id",
-               {
-                 method: "POST",
-                 headers: {
-                   "Content-Type": "application/json",
-                 },
-                 credentials: "include",
-               }
-             );
-           } else {
-             buttonStatus = "follow";
-             followBtn.innerText = "Follow";
-             followBtn.style.backgroundColor = "#0c756d";
-
-             // make a fetch request to the post API
-             const response = await fetch(
-               "http://localhost:3000/api/social/followers/:id",
-               {
-                 method: "DELETE",
-                 headers: {
-                   "Content-Type": "application/json",
-                 },
-                 credentials: "include",
-               }
-             );
-           }
-
-           // store the updated button status in localStorage
-           localStorage.setItem("followButtonStatus", buttonStatus);
-         });
-       */
     </script>
 
     <footer class="footer">

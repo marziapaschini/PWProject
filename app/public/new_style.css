@@ -352,7 +352,6 @@ a {
   font-size: 20px;
 }
 
-
 /* Like */
 .likes {
   font-size: 12px;
@@ -376,7 +375,11 @@ a {
 
 .scrollable-container {
   height: 500px;
-  overflow-y: scroll;
+  overflow-y: auto;
+}
+
+.hide-scrollbar {
+  overflow-y: hidden;
 }
 
 /* message creation */

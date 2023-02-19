@@ -13,14 +13,24 @@
     <header class="header">
       <a href="index.html" class="logo">💬 Messagly</a>
       <div class="search-container">
-        <form class="search-form" action="#" method="get">
+        <form
+          id="search-form"
+          class="search-form"
+          v-on:submit.prevent="search"
+          action="search_results.html"
+          method="get"
+        >
           <input
             type="text"
-            id="search"
+            id="search-input"
+            v-model="searchQuery"
             name="search"
             placeholder="Search users"
+            required
           />
-          <button class="search-button" type="submit">🔍</button>
+          <button id="search-button" class="search-button" type="submit">
+            🔍
+          </button>
         </form>
       </div>
       <button class="home-buttons" id="sign-out-button">⏏️ Sign Out</button>
@@ -30,14 +40,19 @@
       <div class="intro">
         <button
           class="home-buttons"
-          onclick="window.history.back()"
+          onclick="goBack()"
           style="color: white; position: absolute; top: 100px; left: 45px"
         >
           ⬅️ Go Back
         </button>
-        <h3>Your feed</h3>
-        <div class="scrollable-container">
-          <div id="app">
+        <h3 style="margin-bottom: 0.25em">Your feed</h3>
+        <div id="app">
+          <p2 v-show="!isEmpty" style="margin-top: 0.0001em; font-size: 25px"
+            >Read what the users you follow are posting</p2
+          >
+          <div
+            :class="{'scrollable-container': true, 'hide-scrollbar': isEmpty}"
+          >
             <template v-for="message in messages">
               <div class="post-container">
                 <div class="post-header">
@@ -59,6 +74,11 @@
                 </div>
               </div>
             </template>
+            <div v-if="isEmpty">
+              <p2 style="margin-top: 0.0001em; font-size: 25px"
+                >No messages found because you don't follow anyone.</p2
+              >
+            </div>
           </div>
         </div>
       </div>
@@ -136,7 +156,6 @@
                 `http://localhost:3000/api/social/messages/${userId}/${idMsg}`
               )
                 .then((res) => {
-                  console.log(res);
                   return res.json();
                 })
                 .then((message) => {
@@ -149,6 +168,11 @@
                 .catch((err) => {
                   console.error(err);
                 });
+            },
+          },
+          computed: {
+            isEmpty() {
+              return this.messages.length === 0;
             },
           },
         });
@@ -178,6 +202,9 @@
             });
         });
       };
+      function goBack() {
+        window.location.href = "user_profile.html";
+      }
     </script>
   </body>
 </html>

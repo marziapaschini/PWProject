@@ -13,14 +13,24 @@
     <header class="header">
       <a href="index.html" class="logo">💬 Messagly</a>
       <div class="search-container">
-        <form class="search-form" action="#" method="get">
+        <form
+          id="search-form"
+          class="search-form"
+          v-on:submit.prevent="search"
+          action="search_results.html"
+          method="get"
+        >
           <input
             type="text"
-            id="search"
+            id="search-input"
+            v-model="searchQuery"
             name="search"
             placeholder="Search users"
+            required
           />
-          <button class="search-button" type="submit">🔍</button>
+          <button id="search-button" class="search-button" type="submit">
+            🔍
+          </button>
         </form>
       </div>
       <button class="home-buttons" id="sign-out-button">⏏️ Sign Out</button>
@@ -61,7 +71,7 @@
           💬 Your messages
         </button>
         <button class="home-buttons" onclick="toFeed()">👁️‍🗨️ Your feed</button>
-        <button class="home-buttons" onclick="toFollowers()">
+        <button class="home-buttons" id="follower-button">
           👥 Your followers
         </button>
       </div>
@@ -91,7 +101,6 @@
           });
 
         // Set the page
-        const usernameI = localStorage.getItem("username");
         const app = new Vue({
           el: "#app",
           data: {
@@ -102,21 +111,29 @@
               .then((response) => response.json())
               .then((data) => {
                 this.userData = data;
+                localStorage.setItem("userData", JSON.stringify(userData));
               })
               .catch((error) => console.error(error));
-            fetch(`http://localhost:3000/api/social/followers/${userData._id}`)
-              .then((response) => response.json())
-              .then((followers) => {
-                this.followers = followers;
-                /*  const followersList = [];
-                followers.forEach((follower) => {
-                  followersList[i] = JSON.stringify(follower);
-                  i++;
-                });
-                localStorage.setItem("followersList", followersList);*/
-                localStorage.setItem("followers", JSON.stringify(followers));
-              });
           },
+        });
+
+        // View user's followers operation
+        const followerButton = document.getElementById("follower-button");
+        followerButton.addEventListener("click", async (e) => {
+          e.preventDefault();
+          const username = localStorage.getItem("username");
+          fetch(`http://localhost:3000/api/social/followers/${userData._id}`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
+            .then((res) => res.json())
+            .then((followers) => {
+              localStorage.setItem("followers", JSON.stringify(followers));
+              window.location.href = "user_followers.html";
+            })
+            .catch((err) => console.error(err));
         });
 
         // Sign out operation
@@ -143,17 +160,42 @@
             .catch((error) => {
               console.error("Something went wrong during fetch: ", error);
             });
+          const username = localStorage.getItem("username");
+          if (username) {
+            localStorage.removeItem("username");
+          }
+        });
+
+        // Search operation
+        const searchButton = document.getElementById("search-button");
+        searchForm.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const query = searchInput.value;
+          fetch(`http://localhost:3000/api/social/search?q=${query}`)
+            .then((response) => response.json())
+            .then((searchedUsers) => {
+              localStorage.setItem(
+                "searchedUsers",
+                JSON.stringify(searchedUsers)
+              );
+              window.location.href = "search_results.html";
+            })
+            .catch((error) => {
+              console.error(
+                "Something went wrong during fetch to search: ",
+                error
+              );
+            });
         });
       };
+
       function toYourMsgs() {
         window.location.href = "one_user_msgs.html";
       }
       function toFeed() {
         window.location.href = "feed.html";
       }
-      function toFollowers() {
-        window.location.href = "user_followers.html";
-      }
+
       function toMsgWriting() {
         window.location.href = "create_msg.html";
       }
