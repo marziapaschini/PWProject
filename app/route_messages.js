@@ -39,7 +39,7 @@ router.get("/messages", async (req, res) => {
   res.json(allMessages);
 });
 
-router.get("/messages/:userId", async (req, res) => {
+/* router.get("/messages/:userId", async (req, res) => {
   const mongo = db.getDb();
   const id = !isNaN(parseInt(req.params.userId))
     ? parseInt(req.params.userId)
@@ -52,6 +52,44 @@ router.get("/messages/:userId", async (req, res) => {
     .collection("messages")
     .find({ author: user.username })
     .toArray();
+  res.json(userMessages);
+}); */
+
+router.get("/messages/:userId", async (req, res) => {
+  const mongo = db.getDb();
+  const id = !isNaN(parseInt(req.params.userId))
+    ? parseInt(req.params.userId)
+    : null;
+  if (!id) {
+    return res.status(404).send({ error: "Invalid user ID" });
+  }
+  const user = await mongo.collection("users").findOne({ _id: id });
+  const userMessages = await mongo
+    .collection("messages")
+    .aggregate([
+      {
+        $match: { author: user.username },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "author",
+          foreignField: "username",
+          as: "authorInfo",
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          date: 1,
+          text: 1,
+          author: 1,
+          authorId: "$authorInfo._id",
+        },
+      },
+    ])
+    .toArray();
+
   res.json(userMessages);
 });
 

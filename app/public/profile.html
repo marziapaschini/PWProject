@@ -119,15 +119,19 @@
                 `http://localhost:3000/api/social/checkFollowing/${userData._id}`
               )
                 .then((response) => response.json())
-                .then((data) => {
+                .then((dataFlw) => {
                   // If the user is already following the profile, show the unfollow button
-                  if (data.following) {
+                  if (dataFlw.following) {
                     followButton.style.display = "none";
                     unfollowButton.style.display = "inline-block";
                   }
                   // If the user is not following the profile, show the follow button
                   else {
-                    followButton.style.display = "inline-block";
+                    if (userData.username === data.currentUsername) {
+                      followButton.style.display = "none";
+                    } else {
+                      followButton.style.display = "inline-block";
+                    }
                     unfollowButton.style.display = "none";
                   }
                 })

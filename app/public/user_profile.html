@@ -54,9 +54,9 @@
         </div>
       </div>
       <div class="buttons">
-        <button class="home-buttons" id="view-msgs-button">
+<!--         <button class="home-buttons" id="view-msgs-button">
           💬 Your messages
-        </button>
+        </button> -->
         <button class="home-buttons" onclick="toFeed()">👁️‍🗨️ Your feed</button>
         <button class="home-buttons" id="follower-button">
           👥 Your followers
@@ -104,12 +104,13 @@
           },
         });
 
-        // View user's messages operation
+/*         // View user's messages operation
         const viewMsgButton = document.getElementById("view-msgs-button");
         viewMsgButton.addEventListener("click", async (e) => {
           e.preventDefault();
-          const username = localStorage.getItem("username");
+          let username = localStorage.getItem("username");
           if (!username) {
+            const userData = localStorage.getItem("userData");
             username = userData.username;
           }
           fetch(
@@ -127,7 +128,7 @@
               window.location.href = "one_user_msgs.html";
             })
             .catch((err) => console.error(err));
-        });
+        }); */
 
         // View user's followers operation
         const followerButton = document.getElementById("follower-button");

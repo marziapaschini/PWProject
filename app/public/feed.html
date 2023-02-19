@@ -190,7 +190,13 @@
         });
       };
       function goBack() {
-        window.location.href = "user_profile.html";
+        if (document.referrer.endsWith("after_login.html")) {
+          window.location.href = "after_login.html";
+        } else if (document.referrer.endsWith("user_profile.html")) {
+          window.location.href = "user_profile.html";
+        } else {
+          window.history.back();
+        }
       }
       function goToHomepage() {
         window.location.href = "index.html";

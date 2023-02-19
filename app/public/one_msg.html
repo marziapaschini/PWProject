@@ -41,14 +41,6 @@
             <div class="likes">
               <span id="like-count">{{ likes[message._id].count }}</span>
               👍
-              <!--               <button
-                id="likeButton"
-                style="color: white"
-                @click="isLiked ? unlikeMessage() : likeMessage()"
-                v-if="isAuthenticated"
-              >
-                {{ isLiked ? 'Unlike' : 'Like' }}
-              </button> -->
               <button
                 v-if="isAuthenticated && !isLiked"
                 @click="likeMessage"
@@ -110,7 +102,7 @@
                 if (isLikedLocal !== null) {
                   // If the isLiked state is found in local storage, update it and return
                   this.isLiked = isLikedLocal;
-                //  return;
+                  //  return;
                 }
                 // If the isLiked state is not found in local storage, make an API call to check the database
                 fetch(`http://localhost:3000/api/didUserLike/${messageId}`, {
@@ -297,7 +289,7 @@
       function goBack() {
         if (document.referrer.endsWith("feed.html")) {
           window.location.href = "feed.html";
-        } else if (document.referrer.endsWith("msgs.html")) {
+        } else if (document.referrer.endsWith("/msgs.html")) {
           window.location.href = "msgs.html";
         } else if (document.referrer.endsWith("one_user_msgs.html.html")) {
           window.location.href = "one_user_msgs.html";

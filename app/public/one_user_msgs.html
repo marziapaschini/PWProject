@@ -1,135 +1,222 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>💬 Messages</title>
     <link rel="stylesheet" href="new_style.css" />
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11/dist/vue.js"></script>
+    <script src="https://unpkg.com/vue@2.6.14/dist/vue.min.js"></script>
   </head>
 
-  <header class="header">
-    <a href="index.html" class="logo">💬 Messagly</a>
-    <button
-      class="home-buttons"
-      id="search-again-button"
-      onclick="goToHomepage()"
-    >
-      <b>🔍 Search</b>
-    </button>
-    <!-- Only show the "Sign Out" button if the user is authenticated. -->
-    <button class="home-buttons" id="sign-out-button">⏏️ Sign Out</button>
-  </header>
-
-  <main>
-    <div class="intro">
+  <body>
+    <header class="header">
+      <a href="index.html" class="logo">💬 Messagly</a>
       <button
         class="home-buttons"
-        onclick="window.history.back()"
-        style="color: white; position: absolute; top: 100px; left: 45px"
+        id="search-again-button"
+        onclick="goToHomepage()"
       >
-        ⬅️ Go Back
+        <b>🔍 Search</b>
       </button>
-      <div id="app">
-        <h3>{{username}}'s messages</h3>
-        <div class="scrollable-container">
-          <template
-            v-show="!isEmpty"
-            v-for="message in messages"
-            :key="message._id"
-          >
-            <div>
-              <div class="post">
-                <div class="post-header">
-                  <div class="post-author">{{ message.author }}</div>
-                  <div class="post-date">{{ formatDate(message.date) }}</div>
-                </div>
-                <div class="post-content">{{ message.text }}</div>
-                <div class="likes">
-                  <button
-                    class="read-button"
-                    id="oneMsgButton"
-                    v-on:click="readMessage(message.authorId, message._id)"
-                    style="color: white"
-                  >
-                    <b>Read message</b>
-                  </button>
+      <!-- Only show the "Sign Out" button if the user is authenticated. -->
+      <button class="home-buttons" id="sign-out-button">⏏️ Sign Out</button>
+    </header>
+
+    <main>
+      <div class="intro">
+        <button
+          class="home-buttons"
+          onclick="goBack()"
+          style="color: white; position: absolute; top: 100px; left: 45px"
+        >
+          ⬅️ Go Back
+        </button>
+        <div id="app">
+          <h3>{{username}}'s messages</h3>
+          <div class="scrollable-container">
+            <template v-show="!isEmpty" v-for="message in messages">
+              <div>
+                <div class="post">
+                  <div class="post-header">
+                    <div class="post-author">{{ message.author }}</div>
+                    <div class="post-date">{{ formatDate(message.date) }}</div>
+                  </div>
+                  <div class="post-content">{{ message.text }}</div>
+                  <div class="likes">
+                    <span id="like-count">{{ likes[message._id].count }}</span>
+                    👍
+                    <button
+                      class="read-button"
+                      id="oneMsgButton"
+                      v-on:click="readMessage(message.authorId, message._id)"
+                      style="color: white"
+                    >
+                      <b>Read and Like</b>
+                    </button>
+                  </div>
                 </div>
               </div>
+            </template>
+            <div v-if="isEmpty">
+              <p2 style="margin-top: 0.0001em; font-size: 25px"
+                >No messages found.</p2
+              >
             </div>
-          </template>
-          <div v-if="isEmpty">
-            <p2 style="margin-top: 0.0001em; font-size: 25px"
-              >No messages found.</p2
-            >
           </div>
         </div>
       </div>
-    </div>
-  </main>
+    </main>
 
-  <footer class="footer">
-    <div class="copy">© 2023 Developer</div>
-  </footer>
+    <footer class="footer">
+      <div class="copy">© 2023 Developer</div>
+    </footer>
 
-  <script>
-    window.onload = function () {
-      const username = localStorage.getItem("username");
-      const userDataObject = JSON.parse(localStorage.getItem("userData"));
-      const userData = userDataObject[0];
-      if (!username) {
-        username = userData.username;
-      }
-      const messages = JSON.parse(localStorage.getItem(`messages`));
+    <script>
+      window.onload = function () {
+        let username = localStorage.getItem("username");
+        const userDataObject = JSON.parse(localStorage.getItem("userData"));
+        const userData = userDataObject[0];
+        if (!username) {
+          if (userData) {
+            username = userData.username;
+          }
+        }
+        const messages = JSON.parse(localStorage.getItem(`messages`));
 
-      const app = new Vue({
-        el: "#app",
-        data: {
-          messages: null,
-          username: username,
-          userData: userData,
-          isAuthenticated: false,
-        },
-        mounted() {
-          fetch(`http://localhost:3000/api/social/messages/${userData._id}`)
+        const app = new Vue({
+          el: "#app",
+          data: {
+            messages: null,
+            likes: {},
+            username: username,
+            userData: userData,
+            isAuthenticated: false,
+          },
+          mounted() {
+            fetch(`http://localhost:3000/api/social/messages/${userData._id}`)
+              .then((res) => {
+                return res.json();
+              })
+              .then((messages) => {
+                this.messages = messages;
+                messages.forEach((message) => {
+                  fetch(`http://localhost:3000/api/social/like/${message._id}`)
+                    .then((res) => {
+                      return res.json();
+                      localStorage.getItem(
+                        `message-${message._id}-likes-${
+                          likes[message._id].count
+                        }`
+                      );
+                    })
+                    .then((likes) => {
+                      this.$set(this.likes, message._id, {
+                        count: likes.count,
+                      });
+                    });
+                });
+              })
+              .catch((error) => console.error(error));
+
+            // Fetch the API to check if the user is authenticated
+            fetch("http://localhost:3000/api/auth/verify")
+              .then((response) => response.json())
+              .then((data) => {
+                this.isAuthenticated = data.isAuthenticated;
+              })
+              .catch((error) => {
+                console.error(error);
+              });
+          },
+          methods: {
+            formatDate(date) {
+              const dateObject = new Date(date);
+              return dateObject.toLocaleString();
+            },
+            readMessage(userId, idMsg) {
+              fetch(
+                `http://localhost:3000/api/social/messages/${userId}/${idMsg}`
+              )
+                .then((res) => {
+                  console.log(res);
+                  return res.json();
+                })
+                .then((message) => {
+                  localStorage.setItem(
+                    `message-${message._id}`,
+                    JSON.stringify(message)
+                  );
+                  window.location.href = `one_msg.html?id=${message._id}`;
+                })
+                .catch((err) => {
+                  console.error(err);
+                });
+            },
+          },
+          computed: {
+            isEmpty() {
+              return this.messages.length === 0;
+            },
+          },
+        });
+
+        const signOutButton = document.getElementById("sign-out-button");
+        // Fetch the API to check if the user is authenticated
+        fetch("http://localhost:3000/api/auth/verify")
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.isAuthenticated) {
+              // If the user is authenticated, show the logout button
+              signOutButton.style.display = "block";
+            } else {
+              // If the user is not authenticated, hide the logout button
+              signOutButton.style.display = "none";
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+
+        // Sign out operation
+        signOutButton.addEventListener("click", async (e) => {
+          const res = await fetch("http://localhost:3000/api/auth/signout", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
             .then((res) => {
               return res.json();
             })
-            .then((messages) => (this.messages = messages))
-            .catch((error) => console.error(error));
-        },
-        methods: {
-          formatDate(date) {
-            const dateObject = new Date(date);
-            return dateObject.toLocaleString();
-          },
-          readMessage(userId, idMsg) {
-            fetch(
-              `http://localhost:3000/api/social/messages/${userId}/${idMsg}`
-            )
-              .then((res) => {
-                console.log(res);
-                return res.json();
-              })
-              .then((message) => {
-                localStorage.setItem(
-                  `message-${message._id}`,
-                  JSON.stringify(message)
+            .then((data) => {
+              if (data.message === "Successfully logged out") {
+                window.location.href = "index.html";
+              } else if (data.message === "Failed log out") {
+                alert(
+                  "Something went wrong during logging out, please try again"
                 );
-                window.location.href = `one_msg.html?id=${message._id}`;
-              })
-              .catch((err) => {
-                console.error(err);
-              });
-          },
-        },
-        computed: {
-          isEmpty() {
-            return this.messages.length === 0;
-          },
-        },
-      });
-    };
-    function goToHomepage() {
-      window.location.href = "index.html";
-    }
-  </script>
+              }
+            })
+            .catch((error) => {
+              console.error("Something went wrong during fetch: ", error);
+            });
+        });
+      };
+
+      function goToHomepage() {
+        window.location.href = "index.html";
+      }
+
+      function goBack() {
+        if (document.referrer.endsWith("/profile.html")) {
+          window.location.href = "/profile.html";
+        } else if (document.referrer.endsWith("user_profile.html")) {
+          window.location.href = "user_profile.html";
+        } else {
+          window.history.back();
+        }
+      }
+    </script>
+  </body>
 </html>
